@@ -27,5 +27,5 @@ Route::prefix('pemilik')->name('pemilik.')->middleware(['sportify.auth:pemilik']
     Route::get('/slots', [PemilikController::class, 'slotIndex'])->name('slots');
     Route::post('/slots', [PemilikController::class, 'slotStore'])->name('slot.store');
     Route::delete('/slots/{id}', [PemilikController::class, 'slotDestroy'])->name('slot.destroy');
-
+});
 
