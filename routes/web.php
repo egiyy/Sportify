@@ -10,11 +10,6 @@ use App\Http\Controllers\UlasanController;
 use App\Http\Controllers\PemilikController;
 use App\Http\Controllers\AdminController;
 
-// Existing practical controllers
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\MataKuliahController;
-
 /*
 |--------------------------------------------------------------------------
 | SPORTIFY - Main Application Routes
@@ -54,7 +49,7 @@ Route::get('/invoice/{id}', [PembayaranController::class, 'invoice'])->name('boo
 Route::prefix('pemilik')->name('pemilik.')->middleware(['sportify.auth:pemilik'])->group(function () {
     Route::get('/dashboard', [PemilikController::class, 'dashboard'])->name('dashboard');
     
-    // Lapangan
+    // Lapangan CRUD
     Route::get('/lapangan', [PemilikController::class, 'lapanganIndex'])->name('lapangan.index');
     Route::get('/lapangan/create', [PemilikController::class, 'lapanganCreate'])->name('lapangan.create');
     Route::post('/lapangan', [PemilikController::class, 'lapanganStore'])->name('lapangan.store');
@@ -62,17 +57,17 @@ Route::prefix('pemilik')->name('pemilik.')->middleware(['sportify.auth:pemilik']
     Route::put('/lapangan/{id}', [PemilikController::class, 'lapanganUpdate'])->name('lapangan.update');
     Route::delete('/lapangan/{id}', [PemilikController::class, 'lapanganDestroy'])->name('lapangan.destroy');
 
-    // Slots
+    // Slots Management
     Route::get('/slots', [PemilikController::class, 'slotIndex'])->name('slots');
     Route::post('/slots', [PemilikController::class, 'slotStore'])->name('slot.store');
     Route::delete('/slots/{id}', [PemilikController::class, 'slotDestroy'])->name('slot.destroy');
 
-    // Bookings & Payments
+    // Bookings & Payments Verification
     Route::get('/bookings', [PemilikController::class, 'bookingIndex'])->name('bookings');
     Route::post('/bookings/{id}/verify', [PemilikController::class, 'bookingVerifyPayment'])->name('booking.verify');
     Route::post('/bookings/{id}/complete', [PemilikController::class, 'bookingComplete'])->name('booking.complete');
 
-    // Reviews
+    // Customer Reviews Management
     Route::get('/ulasan', [PemilikController::class, 'ulasanIndex'])->name('ulasan');
     Route::post('/ulasan/{id}/reply', [UlasanController::class, 'reply'])->name('ulasan.reply');
 });
@@ -87,26 +82,9 @@ Route::prefix('admin')->name('admin.')->middleware(['sportify.auth:admin'])->gro
     Route::get('/bookings', [AdminController::class, 'bookingIndex'])->name('bookings');
     Route::get('/pembayaran', [AdminController::class, 'pembayaranIndex'])->name('pembayaran');
     
-    // Rewards
+    // Rewards Management
     Route::get('/rewards', [AdminController::class, 'rewardIndex'])->name('rewards');
     Route::post('/rewards', [AdminController::class, 'rewardStore'])->name('reward.store');
     Route::put('/rewards/{id}', [AdminController::class, 'rewardUpdate'])->name('reward.update');
     Route::delete('/rewards/{id}', [AdminController::class, 'rewardDestroy'])->name('reward.destroy');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Previous Course Practicals (Modul 1-6)
-|--------------------------------------------------------------------------
-*/
-Route::get('/profile', [ProfileController::class, 'profile']);
-Route::get('/user', [UserController::class, 'index'])->name('user.index');
-Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
-Route::post('/user', [UserController::class, 'store'])->name('user.store');
-
-Route::get('/matakuliah', [MataKuliahController::class, 'index']);
-Route::get('/matakuliah/create', [MataKuliahController::class, 'create'])->name('matakuliah.create');
-Route::post('/matakuliah', [MataKuliahController::class, 'store'])->name('matakuliah.store');
-Route::get('/matakuliah/{id}/edit', [MataKuliahController::class, 'edit'])->name('matakuliah.edit');
-Route::put('/matakuliah/{id}', [MataKuliahController::class, 'update'])->name('matakuliah.update');
-Route::delete('/matakuliah/{id}', [MataKuliahController::class, 'destroy'])->name('matakuliah.destroy');

@@ -454,8 +454,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/user" class="hover:text-sport-400 transition flex items-center text-slate-400">
-                                <i class="fa-solid fa-code text-[10px] mr-2 text-slate-600"></i> Praktikum Modul 1-6
+                                
                             </a>
                         </li>
                     </ul>

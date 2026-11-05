@@ -39,13 +39,15 @@
                                 class="w-full pl-11 pr-4 py-3 bg-white text-slate-900 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-sport-500 placeholder:text-slate-400">
                         </div>
 
-                        <select name="sport" class="w-full sm:w-auto px-4 py-3 bg-white text-slate-800 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sport-500 border-0">
-                            <option value="semua">Semua Olahraga</option>
-                            <option value="futsal" {{ ($sport ?? '') === 'futsal' ? 'selected' : '' }}>⚽ Futsal</option>
-                            <option value="badminton" {{ ($sport ?? '') === 'badminton' ? 'selected' : '' }}>🏸 Badminton</option>
-                            <option value="basket" {{ ($sport ?? '') === 'basket' ? 'selected' : '' }}>🏀 Basket</option>
-                            <option value="voli" {{ ($sport ?? '') === 'voli' ? 'selected' : '' }}>🏐 Voli</option>
-                        </select>
+                      <select name="sport" class="w-full sm:w-auto px-4 py-3 bg-white text-slate-800 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sport-500 border-0">
+    <option value="semua" {{ !($sport ?? null) || $sport === 'semua' ? 'selected' : '' }}>
+        Semua Olahraga
+    </option>
+    <option value="futsal" {{ ($sport ?? '') === 'futsal' ? 'selected' : '' }}>⚽ Futsal</option>
+    <option value="badminton" {{ ($sport ?? '') === 'badminton' ? 'selected' : '' }}>🏸 Badminton</option>
+    <option value="basket" {{ ($sport ?? '') === 'basket' ? 'selected' : '' }}>🏀 Basket</option>
+    <option value="voli" {{ ($sport ?? '') === 'voli' ? 'selected' : '' }}>🏐 Voli</option>
+</select>
 
                         <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-sport-500 hover:bg-sport-600 text-white font-bold text-sm shadow-lg shadow-sport-500/40 transition whitespace-nowrap">
                             <i class="fa-solid fa-bolt mr-1.5"></i> Temukan Lapangan
@@ -53,26 +55,37 @@
                     </form>
                 </div>
 
-                <!-- Sport Category Pills -->
-                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-2">
-                    <span class="text-xs text-slate-400 font-semibold mr-1">Kategori:</span>
-                    <a href="{{ route('home', ['sport' => 'semua']) }}" class="px-3 py-1 rounded-xl text-xs font-bold {{ !request('sport') || request('sport') === 'semua' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
-                        Semua
-                    </a>
-                    <a href="{{ route('home', ['sport' => 'futsal']) }}" class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'futsal' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
-                        ⚽ Futsal
-                    </a>
-                    <a href="{{ route('home', ['sport' => 'badminton']) }}" class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'badminton' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
-                        🏸 Badminton
-                    </a>
-                    <a href="{{ route('home', ['sport' => 'basket']) }}" class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'basket' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
-                        🏀 Basket
-                    </a>
-                </div>
+             <!-- Sport Category Pills -->
+<div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 pt-2">
+    <span class="text-xs text-slate-400 font-semibold mr-1">Kategori:</span>
 
-            </div>
+    <a href="{{ route('home', ['sport' => 'semua', 'q' => request('q')]) }}"
+       class="px-3 py-1 rounded-xl text-xs font-bold {{ !request('sport') || request('sport') === 'semua' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
+        Semua
+    </a>
 
-            <!-- Right Hero Card / Visual -->
+    <a href="{{ route('home', ['sport' => 'futsal', 'q' => request('q')]) }}"
+       class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'futsal' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
+        ⚽ Futsal
+    </a>
+
+    <a href="{{ route('home', ['sport' => 'badminton', 'q' => request('q')]) }}"
+       class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'badminton' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
+        🏸 Badminton
+    </a>
+
+    <a href="{{ route('home', ['sport' => 'basket', 'q' => request('q')]) }}"
+       class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'basket' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
+        🏀 Basket
+    </a>
+
+    <a href="{{ route('home', ['sport' => 'voli', 'q' => request('q')]) }}"
+       class="px-3 py-1 rounded-xl text-xs font-bold {{ request('sport') === 'voli' ? 'bg-sport-500 text-white' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700' }} transition">
+        🏐 Voli
+    </a>
+</div>
+
+           </div> <!-- Right Hero Card / Visual -->
             <div class="lg:col-span-5 relative">
                 <div class="relative mx-auto max-w-md bg-gradient-to-b from-slate-800/90 to-slate-900/95 p-6 rounded-3xl border border-slate-700 shadow-2xl backdrop-blur-xl">
                     <div class="flex items-center justify-between pb-4 border-b border-slate-700/80">
@@ -247,18 +260,21 @@
                                         ⚽ Futsal
                                     @elseif(strtolower($lapangan->jenis_olahraga) === 'badminton')
                                         🏸 Badminton
-                                    @elseif(strtolower($lapangan->jenis_olahraga) === 'basket')
-                                        🏀 Basket
-                                    @else
-                                        {{ $lapangan->jenis_olahraga }}
-                                    @endif
+                                   @elseif(strtolower($lapangan->jenis_olahraga) === 'basket')
+    🏀 Basket
+@elseif(strtolower($lapangan->jenis_olahraga) === 'voli')
+    🏐 Voli
+@else
+    {{ $lapangan->jenis_olahraga }}
+@endif
                                 </span>
                             </div>
 
                             <!-- Rating Badge -->
                             <div class="absolute top-3 right-3">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 shadow-sm">
-                                    <i class="fa-solid fa-star text-[10px] mr-1"></i> {{ $lapangan->average_rating }}
+                                    <i class="fa-solid fa-star text-[10px] mr-1"></i>
+{{ $lapangan->average_rating ? number_format((float) $lapangan->average_rating, 1) : 'Belum ada rating' }}
                                 </span>
                             </div>
 
