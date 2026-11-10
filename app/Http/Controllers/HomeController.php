@@ -39,22 +39,31 @@ class HomeController extends Controller
             'total_rewards' => Reward::count(),
         ];
 
-        return view('sportify.home', compact('lapangans', 'rewards', 'stats', 'search', 'sport'));
+        return view('sportify.home', compact(
+            'lapangans',
+            'rewards',
+            'stats',
+            'search',
+            'sport'
+        ));
     }
 
     public function lapanganDetail(Request $request, $id)
     {
-        $lapangan = Lapangan::with(['pemilik', 'ulasan.customer'])->findOrFail($id);
+        $lapangan = Lapangan::with(['pemilik', 'ulasan.customer'])
+            ->findOrFail($id);
 
-        $selectedDate = $request->query('tanggal', Carbon::today()->toDateString());
+        $selectedDate = $request->query(
+            'tanggal',
+            Carbon::today()->toDateString()
+        );
 
-        // Get slots for this lapangan on selectedDate
         $slots = Slot::where('id_lapangan', $id)
             ->where('tanggal', $selectedDate)
             ->orderBy('jam_mulai')
             ->get();
 
-        // If no slots exist for this date yet, auto-generate standard slots so user can test seamlessly!
+        // Generate slot standar jika belum tersedia.
         if ($slots->isEmpty()) {
             $timeSlots = [
                 ['08:00', '09:00'],
@@ -88,7 +97,27 @@ class HomeController extends Controller
                 ->get();
         }
 
-        return view('sportify.lapangan_detail', compact('lapangan', 'slots', 'selectedDate'));
+        return view(
+            'sportify.lapangan_detail',
+            compact('lapangan', 'slots', 'selectedDate')
+        );
+    }
+
+    // Mengambil status slot terbaru dalam format JSON.
+    public function getSlots(Request $request, $id)
+    {
+        $request->validate([
+            'tanggal' => 'required|date',
+        ]);
+
+        $lapangan = Lapangan::findOrFail($id);
+
+        $slots = Slot::where('id_lapangan', $lapangan->id_lapangan)
+            ->where('tanggal', $request->tanggal)
+            ->orderBy('jam_mulai')
+            ->get();
+
+        return response()->json($slots);
     }
 
     public function about()

@@ -17,6 +17,10 @@ Route::get('/', [HomeController::class, 'index'])
 Route::get('/lapangan/{id}', [HomeController::class, 'lapanganDetail'])
     ->name('lapangan.detail');
 
+// Refresh status slot lapangan
+Route::get('/lapangan/{id}/slots', [HomeController::class, 'getSlots'])
+    ->name('lapangan.slots');
+
 // Halaman Reward
 Route::get('/rewards', [RewardController::class, 'index'])
     ->name('rewards.index');
