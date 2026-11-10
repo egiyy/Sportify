@@ -12,17 +12,28 @@ use Carbon\Carbon;
 class BookingController extends Controller
 {
     /**
-     * Menyimpan Booking dengan mekanisme Pessimistic Locking
+     * Menyimpan booking dengan mekanisme Pessimistic Locking
      */
     public function store(Request $request)
     {
+        // Pastikan pengguna sudah login sebagai customer
+        if (
+            session('sportify_user_role') !== 'customer' ||
+            !session()->has('sportify_user_id')
+        ) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Silakan login sebagai customer terlebih dahulu.'
+            ], 401);
+        }
+
         $request->validate([
-            'id_customer' => 'required|exists:customer,id_customer',
-            'id_slot'     => 'required|exists:slot,id_slot',
-            'catatan'     => 'nullable|string|max:500',
+            'id_slot' => 'required|exists:slot,id_slot',
+            'catatan' => 'nullable|string|max:500',
         ]);
 
-        $customerId = $request->id_customer;
+        // ID customer diambil dari session, bukan dari input form
+        $customerId = session('sportify_user_id');
         $slotId = $request->id_slot;
 
         try {
@@ -32,14 +43,18 @@ class BookingController extends Controller
                     ->first();
 
                 if (!$slot || $slot->status_slot !== 'tersedia') {
-                    throw new \Exception('Maaf, slot sudah dipesan. Silakan pilih jam lain.');
+                    throw new \Exception(
+                        'Maaf, slot sudah dipesan. Silakan pilih jam lain.'
+                    );
                 }
 
                 $lapangan = Lapangan::findOrFail($slot->id_lapangan);
 
+                // Ubah status slot menjadi dibooking
                 $slot->status_slot = 'dibooking';
                 $slot->save();
 
+                // Simpan data booking
                 return Booking::create([
                     'id_customer' => $customerId,
                     'id_slot' => $slot->id_slot,
@@ -68,17 +83,23 @@ class BookingController extends Controller
     /**
      * Menampilkan booking milik customer yang sedang login
      */
-    public function myBookings()
-    {
-        $customerId = session('sportify_user_id');
 
-        $bookings = Booking::with(['slot.lapangan'])
-            ->where('id_customer', $customerId)
-            ->orderBy('tanggal_booking', 'desc')
-            ->get();
-
-        return view('sportify.customer.my_bookings', compact('bookings'));
+public function myBookings()
+{
+    if (session('sportify_user_role') !== 'customer') {
+        return redirect()->route('login');
     }
+
+    $customerId = session('sportify_user_id');
+
+    $bookings = Booking::with(['slot.lapangan', 'pembayaran', 'ulasan'])
+        ->where('id_customer', $customerId)
+        ->orderBy('tanggal_booking', 'desc')
+        ->paginate(5);
+
+    return view('sportify.customer.my_bookings', compact('bookings'));
+}
+
 
     /**
      * Menampilkan invoice booking
@@ -97,30 +118,37 @@ class BookingController extends Controller
     /**
      * Pembatalan pemesanan
      */
-    public function cancel($id)
-    {
-        $booking = Booking::with('slot')->findOrFail($id);
 
-        if ($booking->status_booking !== 'pending') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pesanan sudah diproses dan tidak dapat dibatalkan.'
-            ], 400);
-        }
+public function cancel($id)
+{
+    $booking = Booking::with('slot')->findOrFail($id);
 
-        DB::transaction(function () use ($booking) {
-            $booking->status_booking = 'cancelled';
-            $booking->save();
-
-            if ($booking->slot) {
-                $booking->slot->status_slot = 'tersedia';
-                $booking->slot->save();
-            }
-        });
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Pesanan berhasil dibatalkan dan jadwal slot telah dibuka kembali.'
-        ]);
+    // Pastikan booking milik customer yang sedang login
+    if (
+        session('sportify_user_role') !== 'customer' ||
+        (int) $booking->id_customer !== (int) session('sportify_user_id')
+    ) {
+        return redirect()->route('customer.bookings')
+            ->with('error', 'Anda tidak memiliki akses untuk membatalkan pesanan ini.');
     }
+
+    if ($booking->status_booking !== 'pending') {
+        return redirect()->route('customer.bookings')
+            ->with('error', 'Pesanan sudah diproses dan tidak dapat dibatalkan.');
+    }
+
+    DB::transaction(function () use ($booking) {
+        $booking->status_booking = 'cancelled';
+        $booking->save();
+
+        if ($booking->slot) {
+            $booking->slot->status_slot = 'tersedia';
+            $booking->slot->save();
+        }
+    });
+
+    return redirect()->route('customer.bookings')
+        ->with('success', 'Pesanan berhasil dibatalkan dan jadwal slot telah dibuka kembali.');
+}
+
 }
