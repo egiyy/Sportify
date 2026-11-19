@@ -24,15 +24,43 @@ class Lapangan extends Model
         'status_verifikasi',
     ];
 
-    // Relasi: Satu lapangan dimiliki oleh satu Pemilik Lapangan
+    // Relasi pemilik lapangan
     public function pemilik()
     {
-        return $this->belongsTo(PemilikLapangan::class, 'id_pemilik', 'id_pemilik');
+        return $this->belongsTo(
+            PemilikLapangan::class,
+            'id_pemilik',
+            'id_pemilik'
+        );
     }
 
-    // Relasi: Satu lapangan diverifikasi oleh Admin
+    // Relasi admin
     public function admin()
     {
-        return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
+        return $this->belongsTo(
+            Admin::class,
+            'id_admin',
+            'id_admin'
+        );
+    }
+
+    // Relasi ulasan
+    public function ulasan()
+    {
+        return $this->hasMany(
+            Ulasan::class,
+            'id_lapangan',
+            'id_lapangan'
+        );
+    }
+
+    // Relasi slot lapangan
+    public function slots()
+    {
+        return $this->hasMany(
+            Slot::class,
+            'id_lapangan',
+            'id_lapangan'
+        );
     }
 }
