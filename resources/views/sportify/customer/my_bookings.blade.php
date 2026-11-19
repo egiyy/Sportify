@@ -188,7 +188,7 @@
 
                             <div class="flex flex-wrap items-center gap-2">
                                 @if($booking->status_booking === 'pending')
-                                    <a href="#" onclick="alert('Fitur pembayaran sedang dalam pengembangan.'); return false;" class="px-3.5 py-2 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs transition shadow-sm">
+                                    <a href="{{ route('pembayaran.show', $booking->id_booking) }}" class="px-3.5 py-2 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs transition shadow-sm">
                                         <i class="fa-solid fa-upload mr-1"></i> {{ $pembayaran ? 'Ganti Bukti Bayar' : 'Bayar Sekarang' }}
                                     </a>
 
@@ -266,9 +266,9 @@
                                   class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sport-500 focus:outline-none"></textarea>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-center space-x-2">
-                        <i class="fa-solid fa-gift text-amber-500"></i>
-                        <span>Anda akan mendapatkan bonus <strong class="font-bold">20 Poin Loyalitas</strong> setelah mengirimkan ulasan!</span>
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-[11px] flex items-center space-x-2">
+                        <i class="fa-solid fa-circle-info text-sport-500"></i>
+                        <span>Ulasan Anda sangat berharga untuk membantu calon penyewa lain dan meningkatkan kualitas lapangan!</span>
                     </div>
 
                     <div class="pt-2 flex items-center justify-end space-x-3">

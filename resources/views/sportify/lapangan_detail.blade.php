@@ -171,7 +171,7 @@ bookingSuccess: false,
                                     <i class="fa-solid fa-circle-check text-emerald-500 mr-1.5"></i> Terverifikasi Admin
                                 </span>
                                 <span class="inline-flex items-center px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200">
-                                    <i class="fa-solid fa-star text-amber-500 mr-1.5"></i> {{ $lapangan->average_rating }} / 5.0 ({{ $lapangan->ulasan->count() }} Ulasan)
+                                    <i class="fa-solid fa-star text-amber-500 mr-1.5"></i> {{ $lapangan->average_rating ? number_format((float) $lapangan->average_rating, 1) : '-' }} / 5.0 ({{ $lapangan->relationLoaded('ulasan') ? $lapangan->ulasan->count() : 0 }} Ulasan)
                                 </span>
                             </div>
 
@@ -209,12 +209,12 @@ bookingSuccess: false,
                         </div>
                         <div class="flex items-center space-x-1 text-amber-400 text-lg">
                             <i class="fa-solid fa-star"></i>
-                            <span class="font-extrabold text-slate-900 text-base ml-1">{{ $lapangan->average_rating }}</span>
+                            <span class="font-extrabold text-slate-900 text-base ml-1">{{ $lapangan->average_rating ? number_format((float) $lapangan->average_rating, 1) : '-' }}</span>
                             <span class="text-xs text-slate-400">/ 5.0</span>
                         </div>
                     </div>
 
-        @if($lapangan->ulasan->isEmpty())
+                    @if(!$lapangan->relationLoaded('ulasan') || $lapangan->ulasan->isEmpty())
                         <div class="text-center py-8 bg-slate-50 rounded-2xl border border-slate-100">
                             <i class="fa-regular fa-comment-dots text-3xl text-slate-300 mb-2"></i>
                             <p class="text-xs font-bold text-slate-600">Belum ada ulasan untuk lapangan ini.</p>
@@ -419,11 +419,11 @@ bookingSuccess: false,
                                     Untuk melanjutkan pemesanan slot ini, Anda harus masuk sebagai akun Pelanggan (Customer).
                                 </p>
                                 <div class="pt-2 flex items-center justify-center space-x-3">
-                                    <a href="{{ route('demo.login', 'customer') }}" class="px-4 py-2.5 rounded-xl bg-sport-600 text-white font-bold text-xs hover:bg-sport-700 transition">
-                                        <i class="fa-solid fa-user mr-1.5"></i> Login Cepat (Customer)
+                                    <a href="{{ route('login') }}" class="px-5 py-2.5 rounded-xl bg-sport-600 text-white font-bold text-xs hover:bg-sport-700 transition shadow-md shadow-sport-600/30">
+                                        <i class="fa-solid fa-arrow-right-to-bracket mr-1.5"></i> Masuk Akun
                                     </a>
-                                    <a href="{{ route('login') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition">
-                                        Masuk Biasa
+                                    <a href="{{ route('register') }}" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 transition">
+                                        Daftar Baru
                                     </a>
                                 </div>
                             </div>
@@ -470,12 +470,10 @@ bookingSuccess: false,
                   class="w-full p-3 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sport-500 focus:outline-none"></textarea>
     </div>
 
-    <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-[11px] flex items-start space-x-2">
-        <i class="fa-solid fa-gift text-amber-500 mt-0.5"></i>
+    <div class="p-3 rounded-xl bg-sport-50 border border-sport-200 text-sport-900 text-[11px] flex items-start space-x-2">
+        <i class="fa-solid fa-circle-info text-sport-600 mt-0.5"></i>
         <span>
-            Pemesanan ini akan memberikan Anda
-            <strong class="font-bold">100 Poin Loyalitas</strong>
-            setelah pembayaran diverifikasi oleh pemilik lapangan!
+            Pastikan jadwal dan jam bermain sudah sesuai. Pembayaran dapat diselesaikan setelah konfirmasi pesanan ini.
         </span>
     </div>
 

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Lapangan;
 use App\Models\Slot;
-use App\Models\Reward;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class HomeController extends Controller
 {
@@ -15,7 +15,12 @@ class HomeController extends Controller
         $search = $request->query('q');
         $sport = $request->query('sport');
 
-        $query = Lapangan::with(['pemilik', 'ulasan'])
+        $withRelations = ['pemilik'];
+        if (Schema::hasTable('ulasan')) {
+            $withRelations[] = 'ulasan';
+        }
+
+        $query = Lapangan::with($withRelations)
             ->where('status_verifikasi', 'approved');
 
         if ($search) {
@@ -31,17 +36,14 @@ class HomeController extends Controller
         }
 
         $lapangans = $query->latest('id_lapangan')->get();
-        $rewards = Reward::where('stok', '>', 0)->take(4)->get();
 
         $stats = [
             'total_lapangan' => Lapangan::where('status_verifikasi', 'approved')->count(),
             'total_sports' => Lapangan::distinct('jenis_olahraga')->count('jenis_olahraga') ?: 4,
-            'total_rewards' => Reward::count(),
         ];
 
         return view('sportify.home', compact(
             'lapangans',
-            'rewards',
             'stats',
             'search',
             'sport'
@@ -50,8 +52,22 @@ class HomeController extends Controller
 
     public function lapanganDetail(Request $request, $id)
     {
-        $lapangan = Lapangan::with(['pemilik', 'ulasan.customer'])
+        $withRelations = ['pemilik'];
+        if (Schema::hasTable('ulasan')) {
+            $withRelations[] = 'ulasan.customer';
+        }
+
+        $lapangan = Lapangan::with($withRelations)
             ->findOrFail($id);
+
+        $currentUserRole = session('sportify_user_role');
+        $currentUserId = session('sportify_user_id');
+        $isOwner = ($currentUserRole === 'pemilik' && $lapangan->id_pemilik == $currentUserId);
+        $isAdmin = ($currentUserRole === 'admin');
+
+        if ($lapangan->status_verifikasi !== 'approved' && !$isOwner && !$isAdmin) {
+            abort(404, 'Lapangan ini sedang dalam tahap verifikasi atau tidak aktif.');
+        }
 
         $selectedDate = $request->query(
             'tanggal',

@@ -8,6 +8,7 @@ use App\Models\Booking;
 use App\Models\Slot;
 use App\Models\Lapangan;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class BookingController extends Controller
 {
@@ -49,6 +50,12 @@ class BookingController extends Controller
                 }
 
                 $lapangan = Lapangan::findOrFail($slot->id_lapangan);
+
+                if ($lapangan->status_verifikasi !== 'approved') {
+                    throw new \Exception(
+                        'Maaf, lapangan ini belum diverifikasi dan disetujui oleh administrator.'
+                    );
+                }
 
                 // Ubah status slot menjadi dibooking
                 $slot->status_slot = 'dibooking';
@@ -92,7 +99,15 @@ public function myBookings()
 
     $customerId = session('sportify_user_id');
 
-    $bookings = Booking::with(['slot.lapangan', 'pembayaran', 'ulasan'])
+    $withRelations = ['slot.lapangan'];
+    if (Schema::hasTable('pembayaran')) {
+        $withRelations[] = 'pembayaran';
+    }
+    if (Schema::hasTable('ulasan')) {
+        $withRelations[] = 'ulasan';
+    }
+
+    $bookings = Booking::with($withRelations)
         ->where('id_customer', $customerId)
         ->orderBy('tanggal_booking', 'desc')
         ->paginate(5);

@@ -41,22 +41,4 @@ class Customer extends Model
             'id_customer'
         );
     }
-
-    public function points()
-    {
-        return $this->hasMany(
-            Point::class,
-            'id_customer',
-            'id_customer'
-        );
-    }
-
-    public function penukaran()
-    {
-        return $this->hasMany(
-            Penukaran::class,
-            'id_customer',
-            'id_customer'
-        );
-    }
 }

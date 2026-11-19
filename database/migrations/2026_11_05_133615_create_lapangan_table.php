@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('harga_per_jam', 10, 2);
             $table->text('deskripsi')->nullable();
             $table->string('foto')->nullable();
-            $table->string('status_verifikasi', 20)->default('approved');
+            $table->string('status_verifikasi', 20)->default('pending');
             $table->timestamps();
         });
     }

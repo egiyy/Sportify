@@ -14,8 +14,16 @@
                 Tambah Lapangan Olahraga Baru
             </h1>
             <p class="text-xs text-slate-500">
-                Lengkapi rincian venue lapangan untuk disewakan kepada pelanggan.
+                Lengkapi rincian venue lapangan untuk diajukan verifikasi ke administrator.
             </p>
+        </div>
+
+        <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center space-x-3">
+            <i class="fa-solid fa-circle-info text-amber-600 text-lg flex-shrink-0"></i>
+            <div>
+                <span class="font-bold block">Verifikasi Persetujuan Administrator:</span>
+                <span class="text-amber-800">Setelah disimpan, lapangan ini akan berstatus <strong>Pending</strong>. Lapangan akan otomatis aktif dan dapat dipesan oleh pelanggan setelah disetujui oleh Administrator.</span>
+            </div>
         </div>
 
         <div class="bg-white rounded-3xl border border-slate-200/90 shadow-xl p-6 sm:p-8">

@@ -11,6 +11,18 @@ class PemilikLapangan extends Model
     protected $table = 'pemilik_lapangan';
     protected $primaryKey = 'id_pemilik';
 
+    protected $fillable = [
+        'nama_pemilik',
+        'email',
+        'password',
+        'no_wa',
+        'status_verifikasi',
+    ];
+
+    protected $hidden = [
+        'password',
+    ];
+
     public function lapangan()
     {
         return $this->hasMany(

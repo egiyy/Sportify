@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PemilikController;
-use App\Http\Controllers\RewardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UlasanController;
 use App\Http\Controllers\AdminController;
@@ -21,10 +21,6 @@ Route::get('/lapangan/{id}', [HomeController::class, 'lapanganDetail'])
 Route::get('/lapangan/{id}/slots', [HomeController::class, 'getSlots'])
     ->name('lapangan.slots');
 
-// Halaman Reward
-Route::get('/rewards', [RewardController::class, 'index'])
-    ->name('rewards.index');
-
 // Authentication
 Route::get('/login', [AuthController::class, 'showLogin'])
     ->name('login');
@@ -39,9 +35,6 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
-Route::get('/demo-login/{role}', [AuthController::class, 'demoLogin'])
-    ->name('demo.login');
-
 // Booking Customer
 Route::post('/booking', [BookingController::class, 'store'])
     ->name('booking.store');
@@ -49,6 +42,15 @@ Route::post('/booking', [BookingController::class, 'store'])
 Route::get('/my-bookings', [BookingController::class, 'myBookings'])
     ->middleware('sportify.auth:customer')
     ->name('customer.bookings');
+
+// Pembayaran & Unggah Bukti Bayar Customer
+Route::get('/booking/{id}/pembayaran', [PembayaranController::class, 'show'])
+    ->middleware('sportify.auth:customer')
+    ->name('pembayaran.show');
+
+Route::post('/booking/{id}/pembayaran', [PembayaranController::class, 'store'])
+    ->middleware('sportify.auth:customer')
+    ->name('pembayaran.store');
 
 // Invoice Booking
 Route::get('/booking/{id}/invoice', [BookingController::class, 'invoice'])
@@ -150,19 +152,6 @@ Route::prefix('admin')
 
         Route::get('/pembayaran', [AdminController::class, 'pembayaranIndex'])
             ->name('pembayaran');
-
-        // Manajemen Reward
-        Route::get('/rewards', [AdminController::class, 'rewardIndex'])
-            ->name('rewards');
-
-        Route::post('/rewards', [AdminController::class, 'rewardStore'])
-            ->name('rewards.store');
-
-        Route::put('/rewards/{id}', [AdminController::class, 'rewardUpdate'])
-            ->name('rewards.update');
-
-        Route::delete('/rewards/{id}', [AdminController::class, 'rewardDestroy'])
-            ->name('rewards.destroy');
     });
 
 // Tentang / Tim Pengembang

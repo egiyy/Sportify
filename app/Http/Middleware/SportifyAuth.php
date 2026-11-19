@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\PemilikLapangan;
 
 class SportifyAuth
 {
@@ -23,7 +24,30 @@ class SportifyAuth
             return redirect()->route('home')->with('error', 'Anda tidak memiliki hak akses ke halaman tersebut.');
         }
 
+        // Khusus pemilik lapangan: kunci akses jika akun belum disetujui admin
+        if (session('sportify_user_role') === 'pemilik') {
+            $pemilik = PemilikLapangan::find(session('sportify_user_id'));
+
+            if (!$pemilik) {
+                session()->flush();
+                return redirect()->route('login')->with('error', 'Akun pemilik tidak ditemukan.');
+            }
+
+            if ($pemilik->status_verifikasi === 'rejected') {
+                session()->flush();
+                return redirect()->route('login')->with('error', 'Akun pemilik lapangan Anda telah ditolak oleh administrator.');
+            }
+
+            // Jika akun belum approved (misal: pending), hanya boleh membuka dashboard (tampilan menunggu) dan logout
+            if ($pemilik->status_verifikasi !== 'approved') {
+                if (!$request->routeIs('pemilik.dashboard') && !$request->routeIs('logout')) {
+                    return redirect()->route('pemilik.dashboard')->with('error', 'Akun Anda sedang menunggu verifikasi administrator. Fitur pemilik belum dapat diakses.');
+                }
+            }
+        }
+
         return $next($request);
     }
 }
+
 

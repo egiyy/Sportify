@@ -18,22 +18,28 @@
                     Pusat Kontrol & Pengawasan Sportify
                 </h1>
                 <p class="text-xs sm:text-sm text-slate-500">
-                    Memantau data lapangan, transaksi pemesanan, verifikasi mitra, dan katalog reward.
+                    Memantau data lapangan, transaksi pemesanan, dan verifikasi mitra.
                 </p>
             </div>
 
-            <div class="flex items-center space-x-2">
-                <a href="{{ route('admin.lapangan') }}" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition">
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="{{ route('admin.lapangan') }}" class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition">
                     <i class="fa-solid fa-check-to-slot mr-1.5"></i> Verifikasi Lapangan
                 </a>
-                <a href="{{ route('admin.rewards') }}" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-md transition">
-                    <i class="fa-solid fa-gifts mr-1.5"></i> Kelola Hadiah
+                <a href="{{ route('admin.pemilik') }}" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition">
+                    <i class="fa-solid fa-user-check mr-1.5"></i> Akun Pemilik
+                </a>
+                <a href="{{ route('admin.bookings') }}" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs shadow-sm transition">
+                    <i class="fa-solid fa-calendar-check mr-1.5 text-blue-500"></i> Pesanan
+                </a>
+                <a href="{{ route('admin.pembayaran') }}" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs shadow-sm transition">
+                    <i class="fa-solid fa-receipt mr-1.5 text-emerald-500"></i> Pembayaran
                 </a>
             </div>
         </div>
 
-        <!-- 7 Key System Metrics Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+        <!-- 6 Key System Metrics Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             
             <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-sm">
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Total Customer</span>
@@ -67,18 +73,6 @@
                 <span class="text-[10px] text-slate-500">Semua venue</span>
             </div>
 
-            <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-sm">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Poin Loyalitas Beredar</span>
-                <span class="font-display font-extrabold text-2xl text-amber-500 mt-1 block">{{ $stats['total_poin_beredar'] }}</span>
-                <span class="text-[10px] text-slate-500">Dimiliki pelanggan</span>
-            </div>
-
-            <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-sm">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Klaim Hadiah Reward</span>
-                <span class="font-display font-extrabold text-2xl text-purple-600 mt-1 block">{{ $stats['total_penukaran'] }}</span>
-                <span class="text-[10px] text-slate-500">Penukaran selesai</span>
-            </div>
-
             <div class="bg-gradient-to-br from-slate-900 to-dark-950 text-white p-5 rounded-3xl shadow-sm flex flex-col justify-between">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status Database</span>
                 <div class="flex items-center space-x-2 my-1">
@@ -89,6 +83,53 @@
             </div>
 
         </div>
+
+        <!-- Pending Owner Approvals (Verifikasi Akun Pemilik) -->
+        @if(isset($pendingPemilik) && $pendingPemilik->isNotEmpty())
+            <div class="bg-blue-50 border border-blue-300 rounded-3xl p-6 space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-user-clock text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-blue-900">Ada {{ $pendingPemilik->count() }} Pendaftaran Akun Pemilik Menunggu Verifikasi</h3>
+                            <p class="text-xs text-blue-700">Setujui akun pemilik agar mitra venue dapat mengelola dan menambahkan lapangannya.</p>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.pemilik') }}" class="text-xs font-bold text-blue-700 hover:text-blue-900">
+                        Kelola Semua Akun <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($pendingPemilik as $pem)
+                        <div class="bg-white p-4 rounded-2xl border border-blue-200 flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-xs text-slate-900">{{ $pem->nama_pemilik }}</h4>
+                                <span class="text-[11px] text-slate-500">{{ $pem->email }} &bull; {{ $pem->no_wa ?? 'Tanpa WA' }}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <form action="{{ route('admin.pemilik.verify', $pem->id_pemilik) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="status" value="approved">
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition">
+                                        Setujui
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.pemilik.verify', $pem->id_pemilik) }}" method="POST" onsubmit="return confirm('Tolak pendaftaran pemilik ini?');">
+                                    @csrf
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-rose-100 text-rose-700 font-bold text-xs hover:bg-rose-200 transition">
+                                        Tolak
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         <!-- Pending Field Approvals (Per Bab II 2.3: Admin memverifikasi venue baru) -->
         @if($pendingLapangan->isNotEmpty())

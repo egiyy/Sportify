@@ -54,6 +54,17 @@ class Lapangan extends Model
         );
     }
 
+    // Accessor rata-rata rating
+    public function getAverageRatingAttribute()
+    {
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('ulasan') && $this->relationLoaded('ulasan')) {
+                return $this->ulasan->avg('rating');
+            }
+        } catch (\Throwable $e) {}
+        return null;
+    }
+
     // Relasi slot lapangan
     public function slots()
     {

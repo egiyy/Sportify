@@ -144,16 +144,16 @@
                         <i class="fa-solid fa-sitemap"></i>
                     </div>
                     <div>
-                        <h2 class="font-display font-extrabold text-xl text-slate-900">Perancangan Basis Data 10 Entitas (ERD)</h2>
-                        <p class="text-xs text-slate-500">Struktur relasi tabel sesuai Bab III dokumen perancangan</p>
+                        <h2 class="font-display font-extrabold text-xl text-slate-900">Perancangan Basis Data Entitas (ERD)</h2>
+                        <p class="text-xs text-slate-500">Struktur relasi tabel utama sesuai perancangan sistem</p>
                     </div>
                 </div>
                 <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">
-                    10 Tabel Sesuai Laporan
+                    Tabel Terintegrasi
                 </span>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
                     <span class="font-mono text-xs font-bold text-slate-900 block">1. admin</span>
                     <span class="text-[10px] text-slate-500">PK: id_admin</span>
@@ -183,16 +183,8 @@
                     <span class="text-[10px] text-slate-500">PK: id_pembayaran</span>
                 </div>
                 <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-                    <span class="font-mono text-xs font-bold text-slate-900 block">8. point</span>
-                    <span class="text-[10px] text-slate-500">PK: id_point</span>
-                </div>
-                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-                    <span class="font-mono text-xs font-bold text-slate-900 block">9. reward</span>
-                    <span class="text-[10px] text-slate-500">PK: id_reward</span>
-                </div>
-                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-                    <span class="font-mono text-xs font-bold text-slate-900 block">10. penukaran</span>
-                    <span class="text-[10px] text-slate-500">PK: id_penukaran</span>
+                    <span class="font-mono text-xs font-bold text-slate-900 block">8. ulasan</span>
+                    <span class="text-[10px] text-slate-500">PK: id_ulasan</span>
                 </div>
             </div>
 

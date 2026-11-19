@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 use App\Models\Ulasan;
-use App\Models\Point;
 use Carbon\Carbon;
 
 class UlasanController extends Controller
@@ -38,14 +37,7 @@ class UlasanController extends Controller
             'komentar' => $request->komentar,
         ]);
 
-        // Bonus 20 loyalty points for reviewing!
-        Point::create([
-            'id_customer' => $customerId,
-            'jumlah_point' => 20,
-            'riwayat_transaksi' => 'Bonus Ulasan Lapangan #' . $booking->id_booking,
-        ]);
-
-        return back()->with('success', 'Terima kasih atas ulasan Anda! Anda mendapatkan bonus 20 Poin Loyalitas Sportify!');
+        return back()->with('success', 'Terima kasih atas ulasan dan penilaian yang Anda berikan!');
     }
 
     public function reply(Request $request, $id)

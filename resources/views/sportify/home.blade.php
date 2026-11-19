@@ -27,7 +27,7 @@
                 </h1>
 
                 <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal">
-                    Cek ketersediaan slot jam secara real-time, pesan instan, unggah bukti bayar mudah, dan kumpulkan <strong class="text-amber-400 font-semibold">Poin Loyalitas</strong> untuk ditukar hadiah minuman & merchandise keren!
+                    Cek ketersediaan slot jam secara real-time, pesan instan tanpa antre, unggah bukti pembayaran dengan mudah, dan nikmati kemudahan sewa lapangan olahraga!
                 </p>
 
                 <!-- Search & Filter Form -->
@@ -128,21 +128,16 @@
                             </span>
                         </div>
 
-                        <!-- Mini Loyalty Points Promo Box -->
-                        <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/10 to-transparent border border-amber-500/30">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center space-x-2.5">
-                                    <div class="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-sm">
-                                        <i class="fa-solid fa-gift"></i>
-                                    </div>
-                                    <div>
-                                        <h5 class="text-xs font-bold text-amber-300">Sistem Poin & Reward</h5>
-                                        <p class="text-[10px] text-slate-300">Dapatkan hingga 100 poin tiap kali main!</p>
-                                    </div>
+                        <!-- Mini Info Box -->
+                        <div class="p-3.5 rounded-2xl bg-gradient-to-r from-sport-500/20 via-emerald-500/10 to-transparent border border-sport-500/30">
+                            <div class="flex items-center space-x-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-sport-500 text-white flex items-center justify-center font-bold text-sm">
+                                    <i class="fa-solid fa-clock"></i>
                                 </div>
-                                <a href="{{ route('rewards.index') }}" class="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 font-extrabold text-[10px] hover:bg-amber-400 transition">
-                                    Tukar
-                                </a>
+                                <div>
+                                    <h5 class="text-xs font-bold text-sport-300">Pemesanan Instan 24/7</h5>
+                                    <p class="text-[10px] text-slate-300">Pilih slot jadwal sesuai kebutuhan Anda</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -177,12 +172,12 @@
 
             <div class="flex items-start space-x-4 p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-md transition">
                 <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl flex-shrink-0">
-                    <i class="fa-solid fa-coins"></i>
+                    <i class="fa-solid fa-star"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-base text-slate-900 mb-1">Poin & Reward Gratis</h3>
+                    <h3 class="font-bold text-base text-slate-900 mb-1">Ulasan & Rating Transparan</h3>
                     <p class="text-xs text-slate-600 leading-relaxed">
-                        Setiap transaksi pemesanan yang selesai otomatis menghasilkan poin loyalitas. Tukar dengan minuman dingin, handuk, atau jersey!
+                        Lihat penilaian dan ulasan nyata dari pelanggan lain sebelum memilih lapangan olahraga yang sesuai untuk Anda.
                     </p>
                 </div>
             </div>
@@ -305,7 +300,7 @@
                                     </span>
                                     <span>
                                         <i class="fa-solid fa-comment-dots mr-1 text-slate-400"></i>
-                                        {{ $lapangan->ulasan->count() }} Ulasan
+                                        {{ $lapangan->relationLoaded('ulasan') ? $lapangan->ulasan->count() : 0 }} Ulasan
                                     </span>
                                 </div>
                             </div>
@@ -323,48 +318,6 @@
                 @endforeach
             </div>
         @endif
-
-    </div>
-</section>
-
-<!-- Rewards Loyalty Highlight Section -->
-<section class="py-16 bg-white border-t border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div class="p-8 sm:p-12 rounded-3xl gradient-dark text-white relative overflow-hidden shadow-2xl">
-            <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-amber-500/20 rounded-full blur-3xl"></div>
-            
-            <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                <div class="lg:col-span-7 space-y-4">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
-                        <i class="fa-solid fa-gift mr-1.5"></i> SPORTIFY LOYALTY CLUB
-                    </span>
-                    <h2 class="font-display font-extrabold text-3xl sm:text-4xl tracking-tight">
-                        Main Terus, Kumpulkan Poin, Dapatkan Hadiah Gratis!
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-xl">
-                        Setiap kali pesananmu selesai, kamu akan langsung dihadiahi poin loyalitas. Tukarkan poinmu dengan minuman segar langsung di tempat, handuk, jersey edisi terbatas, atau voucher potongan sewa!
-                    </p>
-                    <div class="pt-2">
-                        <a href="{{ route('rewards.index') }}" class="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-amber-500/30 transition transform hover:-translate-y-0.5">
-                            <i class="fa-solid fa-gifts mr-2 text-sm"></i> Buka Katalog Reward Sportify
-                        </a>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-5 grid grid-cols-2 gap-3">
-                    @foreach($rewards->take(4) as $rew)
-                        <div class="p-3 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-center">
-                            <img src="{{ $rew->foto }}" alt="{{ $rew->nama_reward }}" class="w-16 h-16 object-cover rounded-xl mx-auto mb-2">
-                            <h4 class="text-xs font-bold text-white line-clamp-1">{{ $rew->nama_reward }}</h4>
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-extrabold border border-amber-500/30">
-                                {{ $rew->poin_dibutuhkan }} Poin
-                            </span>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
 
     </div>
 </section>
