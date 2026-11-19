@@ -62,15 +62,148 @@
     </style>
     @stack('styles')
 </head>
-<body class="flex flex-col min-h-full font-sans text-slate-800 antialiased selection:bg-sport-500 selection:text-white">
+<body class="flex flex-col min-h-full font-sans text-slate-800 antialiased selection:bg-sport-500 selection:text-white" x-data="{ mobileOpen: false, pemilikSidebarOpen: false }" @keydown.window.escape="pemilikSidebarOpen = false">
+
+    <!-- Overlay Sidebar Navigasi Pemilik (Left Slide-over matching Sportify light theme) -->
+    @if(session('sportify_user_role') === 'pemilik')
+        <div x-show="pemilikSidebarOpen" 
+             x-cloak 
+             class="fixed inset-0 z-[100] flex" 
+             role="dialog" 
+             aria-modal="true">
+            
+            <!-- Soft Backdrop with Blur -->
+            <div x-show="pemilikSidebarOpen"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="pemilikSidebarOpen = false"
+                 class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"></div>
+
+            <!-- Drawer Container on the LEFT (Clean Light Theme) -->
+            <div x-show="pemilikSidebarOpen"
+                 x-transition:enter="transform transition ease-out duration-300"
+                 x-transition:enter-start="-translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transform transition ease-in duration-200"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="-translate-x-full"
+                 class="relative w-72 sm:w-80 bg-white border-r border-slate-200 shadow-2xl flex flex-col justify-between h-full p-5 z-10">
+
+                <div class="space-y-6">
+                    <!-- Header with venue name & close button -->
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                        <div class="flex items-center space-x-3 min-w-0">
+                            <!-- Avatar Venue -->
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-blue-500 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-blue-500/20 flex-shrink-0">
+                                {{ strtoupper(substr(session('sportify_user_name', 'P'), 0, 1)) }}
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-sm text-slate-900 truncate leading-tight">
+                                    {{ session('sportify_user_name') }}
+                                </h3>
+                                <div class="flex items-center space-x-1.5 mt-0.5">
+                                    <span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded-md bg-blue-50 text-blue-700">
+                                        Pemilik Venue
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Close Button -->
+                        <button type="button" 
+                                @click="pemilikSidebarOpen = false" 
+                                class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition focus:outline-none">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Navigation Items (Clean Sportify Style) -->
+                    <div>
+                        <p class="text-[10px] uppercase font-bold tracking-wider text-slate-600 px-3 mb-2.5">Menu Pemilik</p>
+                        <nav class="space-y-1.5">
+                            <!-- 1. Dashboard Pemilik -->
+                            <a href="{{ route('pemilik.dashboard') }}" 
+                               @click="pemilikSidebarOpen = false"
+                               class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('pemilik.dashboard') ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/80 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                                <i class="fa-solid fa-gauge-high w-5 text-center text-sm {{ request()->routeIs('pemilik.dashboard') ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                <span>Dashboard</span>
+                            </a>
+
+                            <!-- 2. Kelola Lapangan -->
+                            <a href="{{ route('pemilik.lapangan.index') }}" 
+                               @click="pemilikSidebarOpen = false"
+                               class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('pemilik.lapangan.*') ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/80 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                                <i class="fa-solid fa-layer-group w-5 text-center text-sm {{ request()->routeIs('pemilik.lapangan.*') ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                <span>Kelola Lapangan</span>
+                            </a>
+
+                            <!-- 3. Atur Slot Jadwal -->
+                            <a href="{{ route('pemilik.slots') }}" 
+                               @click="pemilikSidebarOpen = false"
+                               class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('pemilik.slots') ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/80 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                                <i class="fa-solid fa-clock w-5 text-center text-sm {{ request()->routeIs('pemilik.slots') ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                <span>Atur Slot Jadwal</span>
+                            </a>
+
+                            <!-- 4. Verifikasi Pesanan -->
+                            <a href="{{ route('pemilik.bookings') }}" 
+                               @click="pemilikSidebarOpen = false"
+                               class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('pemilik.bookings') ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/80 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                                <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-sm {{ request()->routeIs('pemilik.bookings') ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                <span>Verifikasi Pesanan</span>
+                            </a>
+
+                            <!-- 5. Ulasan Pelanggan -->
+                            <a href="{{ route('pemilik.ulasan.index') }}" 
+                               @click="pemilikSidebarOpen = false"
+                               class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition {{ request()->routeIs('pemilik.ulasan.*') ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/80 shadow-sm' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80' }}">
+                                <i class="fa-solid fa-comments w-5 text-center text-sm {{ request()->routeIs('pemilik.ulasan.*') ? 'text-blue-600' : 'text-slate-400' }}"></i>
+                                <span>Ulasan Pelanggan</span>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Bottom Logout Button -->
+                <div class="pt-4 border-t border-slate-100">
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center text-sm"></i>
+                            <span>Keluar (Logout)</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 
     <!-- Main Navigation Bar -->
-    <header x-data="{ mobileOpen: false }" class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 
-                <!-- Logo -->
-                <div class="flex items-center">
+                <!-- Logo & Pemilik Overlay Toggle Button -->
+                <div class="flex items-center space-x-3">
+                    @if(session('sportify_user_role') === 'pemilik')
+                        @php
+                            $currentPemilikNav = \App\Models\PemilikLapangan::find(session('sportify_user_id'));
+                            $isPemilikApproved = $currentPemilikNav && $currentPemilikNav->status_verifikasi === 'approved';
+                        @endphp
+                        @if($isPemilikApproved)
+                            <button @click="pemilikSidebarOpen = true" 
+                                    type="button" 
+                                    title="Menu Navigasi" 
+                                    class="text-slate-600 hover:text-slate-900 transition focus:outline-none p-1">
+                                <i class="fa-solid fa-bars text-xl"></i>
+                            </button>
+                        @endif
+                    @endif
+
                     <a href="{{ route('home') }}" class="flex items-center space-x-3 group">
                         <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sport-600 to-sport-400 flex items-center justify-center text-white shadow-md shadow-sport-500/20 group-hover:scale-105 transition-transform duration-300">
                             <i class="fa-solid fa-futbol text-xl"></i>
@@ -79,43 +212,17 @@
                             <span class="font-display font-extrabold text-2xl tracking-tight text-slate-900 group-hover:text-sport-600 transition">
                                 SPORT<span class="text-sport-500">IFY</span>
                             </span>
-                            <span class="block text-[10px] font-semibold text-slate-600 tracking-wider uppercase -mt-1">
-                                Futsal & Sports Center
-                            </span>
                         </div>
                     </a>
                 </div>
 
                 <!-- Desktop Nav Links -->
                 <nav class="hidden md:flex items-center space-x-1 lg:space-x-2">
-                    <a href="{{ route('home') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-sport-50 text-sport-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
-                        <i class="fa-solid fa-magnifying-glass mr-1.5 text-sport-500"></i> Cari Lapangan
-                    </a>
 
                     @if(session('sportify_user_role') === 'customer')
                         <a href="{{ route('customer.bookings') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('customer.bookings') ? 'bg-sport-50 text-sport-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
                             <i class="fa-solid fa-calendar-check mr-1.5 text-blue-500"></i> Pesanan Saya
                         </a>
-                    @elseif(session('sportify_user_role') === 'pemilik')
-                        @php
-                            $currentPemilikNav = \App\Models\PemilikLapangan::find(session('sportify_user_id'));
-                            $isPemilikApproved = $currentPemilikNav && $currentPemilikNav->status_verifikasi === 'approved';
-                        @endphp
-                        @if($isPemilikApproved)
-                            <a href="{{ route('pemilik.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('pemilik.dashboard') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
-                                <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard Pemilik
-                            </a>
-                            <a href="{{ route('pemilik.lapangan.index') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('pemilik.lapangan.*') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
-                                <i class="fa-solid fa-layer-group mr-1.5"></i> Lapangan Saya
-                            </a>
-                            <a href="{{ route('pemilik.bookings') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('pemilik.bookings') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
-                                <i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Verifikasi Pesanan
-                            </a>
-                        @else
-                            <a href="{{ route('pemilik.dashboard') }}" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 transition">
-                                <i class="fa-solid fa-clock mr-1 text-amber-600 animate-pulse"></i> Status: Menunggu Verifikasi Admin
-                            </a>
-                        @endif
                     @elseif(session('sportify_user_role') === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 transition">
                             <i class="fa-solid fa-shield-halved mr-1.5"></i> Admin Dashboard
@@ -124,10 +231,6 @@
                             <i class="fa-solid fa-check-double mr-1.5"></i> Verifikasi Lapangan
                         </a>
                     @endif
-
-                    <a href="{{ route('about') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('about') ? 'bg-sport-50 text-sport-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
-                        <i class="fa-solid fa-users mr-1.5 text-slate-500"></i> Tim Pengembang
-                    </a>
                 </nav>
 
                 <!-- Right Side User Menu / Auth Buttons -->
@@ -157,9 +260,8 @@
 
                             <div x-show="open" @click.away="open = false" x-cloak class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
                                 <div class="px-4 py-2 border-b border-slate-100">
-                                    <p class="text-xs text-slate-600 font-medium">Masuk sebagai:</p>
                                     <p class="text-sm font-bold text-slate-900 truncate">{{ session('sportify_user_name') }}</p>
-                                    <span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded-md mt-1 {{ $role === 'admin' ? 'bg-purple-100 text-purple-700' : ($role === 'pemilik' ? 'bg-blue-100 text-blue-700' : 'bg-sport-100 text-sport-700') }}">
+                                    <span class="inline-block px-2 py-0.5 text-[10px] font-bold rounded-md mt-1 {{ $role === 'admin' ? 'bg-purple-100 text-purple-700' : ($role === 'pemilik' ? 'text-blue-700' : 'bg-sport-100 text-sport-700') }}">
                                         {{ ucfirst($role) }}
                                     </span>
                                 </div>
@@ -174,21 +276,6 @@
                                         $isPemilikApprovedDrop = $currentPemilikDrop && $currentPemilikDrop->status_verifikasi === 'approved';
                                     @endphp
                                     @if($isPemilikApprovedDrop)
-                                        <a href="{{ route('pemilik.dashboard') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                            <i class="fa-solid fa-gauge text-slate-400 mr-2.5 w-4"></i> Dashboard Pemilik
-                                        </a>
-                                        <a href="{{ route('pemilik.lapangan.index') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                            <i class="fa-solid fa-futbol text-slate-400 mr-2.5 w-4"></i> Kelola Lapangan
-                                        </a>
-                                        <a href="{{ route('pemilik.slots') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                            <i class="fa-solid fa-clock text-slate-400 mr-2.5 w-4"></i> Atur Slot Jadwal
-                                        </a>
-                                        <a href="{{ route('pemilik.bookings') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                            <i class="fa-solid fa-file-invoice-dollar text-slate-400 mr-2.5 w-4"></i> Verifikasi Pesanan
-                                        </a>
-                                        <a href="{{ route('pemilik.ulasan.index') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                            <i class="fa-solid fa-comments text-slate-400 mr-2.5 w-4"></i> Ulasan Pelanggan
-                                        </a>
                                     @else
                                         <div class="px-4 py-2 text-xs text-amber-700 font-semibold bg-amber-50 border-y border-amber-100 flex items-center">
                                             <i class="fa-solid fa-clock mr-2 text-amber-600 animate-pulse"></i> Menunggu Verifikasi Admin
@@ -268,15 +355,9 @@
                             $isPemilikApprovedMob = $currentPemilikMob && $currentPemilikMob->status_verifikasi === 'approved';
                         @endphp
                         @if($isPemilikApprovedMob)
-                            <a href="{{ route('pemilik.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                                <i class="fa-solid fa-gauge mr-2"></i> Dashboard Pemilik
-                            </a>
-                            <a href="{{ route('pemilik.lapangan.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                                <i class="fa-solid fa-layer-group mr-2"></i> Lapangan Saya
-                            </a>
-                            <a href="{{ route('pemilik.bookings') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                                <i class="fa-solid fa-file-invoice-dollar mr-2"></i> Verifikasi Pesanan
-                            </a>
+                            <button @click="pemilikSidebarOpen = true; mobileOpen = false" type="button" class="w-full text-left flex items-center px-3 py-2.5 rounded-xl text-sm font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 transition">
+                                <i class="fa-solid fa-bars-staggered text-blue-600 mr-2.5 w-4"></i> Buka Sidebar Navigasi
+                            </button>
                         @else
                             <div class="px-3 py-2 rounded-lg text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200">
                                 <i class="fa-solid fa-clock mr-2 text-amber-600 animate-pulse"></i> Akun Menunggu Verifikasi Admin

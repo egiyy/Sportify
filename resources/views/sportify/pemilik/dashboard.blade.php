@@ -75,32 +75,14 @@
             <!-- Header -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">PORTAL MITRA VENUE</span>
-                        <span class="text-xs text-slate-400">|</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">
-                            <i class="fa-solid fa-circle-check mr-1"></i> Akun Terverifikasi
-                        </span>
-                        <span class="text-xs text-slate-400">|</span>
-                        <span class="text-xs text-slate-500">{{ session('sportify_user_email') }}</span>
-                    </div>
                     <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight mt-1">
                         Dashboard {{ session('sportify_user_name') }}
                     </h1>
-                    <p class="text-xs sm:text-sm text-slate-500">
-                        Pantau kinerja penyewaan lapangan, konfirmasi jadwal, dan verifikasi bukti pembayaran.
-                    </p>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-2">
                     <a href="{{ route('pemilik.lapangan.create') }}" class="px-4 py-2.5 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs shadow-md shadow-sport-600/30 transition">
                         <i class="fa-solid fa-plus mr-1.5"></i> Tambah Lapangan
-                    </a>
-                    <a href="{{ route('pemilik.slots') }}" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-md transition">
-                        <i class="fa-solid fa-clock mr-1.5"></i> Atur Slot
-                    </a>
-                    <a href="{{ route('pemilik.ulasan.index') }}" class="px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-bold text-xs shadow-sm transition">
-                        <i class="fa-solid fa-comments mr-1.5 text-blue-500"></i> Ulasan
                     </a>
                 </div>
             </div>

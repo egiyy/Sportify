@@ -25,6 +25,23 @@ class AppServiceProvider extends ServiceProvider
         \Carbon\Carbon::setLocale('id');
 
         try {
+            // Pastikan akun default Administrator selalu tersedia dan aktif
+            if (Schema::hasTable('admin')) {
+                $admin = \App\Models\Admin::where('email', 'admin@sportify.com')->first();
+                if (!$admin) {
+                    \App\Models\Admin::create([
+                        'nama_admin' => 'Administrator Sportify',
+                        'email' => 'admin@sportify.com',
+                        'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+                        'no_wa' => '081234567890',
+                    ]);
+                } else {
+                    $admin->update([
+                        'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+                    ]);
+                }
+            }
+
             if (Schema::hasTable('booking')) {
                 if (!Schema::hasTable('pembayaran')) {
                     Schema::create('pembayaran', function (Blueprint $table) {
