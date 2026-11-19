@@ -188,7 +188,7 @@
 
                             <div class="flex flex-wrap items-center gap-2">
                                 @if($booking->status_booking === 'pending')
-                                    <a href="{{ route('pembayaran.show', $booking->id_booking) }}" class="px-3.5 py-2 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs transition shadow-sm">
+                                    <a href="#" onclick="alert('Fitur pembayaran sedang dalam pengembangan.'); return false;" class="px-3.5 py-2 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs transition shadow-sm">
                                         <i class="fa-solid fa-upload mr-1"></i> {{ $pembayaran ? 'Ganti Bukti Bayar' : 'Bayar Sekarang' }}
                                     </a>
 
