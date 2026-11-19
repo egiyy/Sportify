@@ -20,10 +20,28 @@
                 </p>
             </div>
 
-            <a href="{{ route('pemilik.lapangan.create') }}" class="inline-flex items-center px-4 py-2.5 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs shadow-md shadow-sport-600/30 transition">
-                <i class="fa-solid fa-plus mr-1.5"></i> Tambah Lapangan Baru
-            </a>
+            @if(isset($pemilik) && $pemilik->status_verifikasi !== 'approved')
+                <button type="button" disabled title="Akun Anda masih menunggu verifikasi admin" class="inline-flex items-center px-4 py-2.5 rounded-xl bg-slate-300 text-slate-500 font-bold text-xs cursor-not-allowed">
+                    <i class="fa-solid fa-lock mr-1.5"></i> Akun Belum Terverifikasi
+                </button>
+            @else
+                <a href="{{ route('pemilik.lapangan.create') }}" class="inline-flex items-center px-4 py-2.5 rounded-xl bg-sport-600 hover:bg-sport-700 text-white font-bold text-xs shadow-md shadow-sport-600/30 transition">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Tambah Lapangan Baru
+                </a>
+            @endif
         </div>
+
+        @if(isset($pemilik) && $pemilik->status_verifikasi !== 'approved')
+            <div class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-clock-rotate-left text-amber-600 text-xl"></i>
+                    <div>
+                        <span class="font-bold block text-sm">Status Akun Pemilik: {{ $pemilik->status_verifikasi === 'pending' ? 'Menunggu Verifikasi Administrator' : 'Ditolak' }}</span>
+                        <span class="text-amber-700">Akun Anda sedang dalam proses peninjauan oleh Administrator. Anda baru dapat menambahkan lapangan setelah akun disetujui.</span>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         @if($lapangans->isEmpty())
             <div class="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
@@ -50,6 +68,21 @@
                                         {{ $lap->jenis_olahraga }}
                                     </span>
                                 </div>
+                                <div class="absolute top-3 right-3">
+                                    @if($lap->status_verifikasi === 'approved')
+                                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-500 text-white shadow-sm flex items-center">
+                                            <i class="fa-solid fa-circle-check mr-1"></i> Disetujui
+                                        </span>
+                                    @elseif($lap->status_verifikasi === 'rejected')
+                                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-rose-500 text-white shadow-sm flex items-center">
+                                            <i class="fa-solid fa-circle-xmark mr-1"></i> Ditolak
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 shadow-sm animate-pulse flex items-center">
+                                            <i class="fa-solid fa-clock mr-1"></i> Menunggu Admin
+                                        </span>
+                                    @endif
+                                </div>
                                 <div class="absolute bottom-3 right-3">
                                     <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-sport-600 text-white shadow-md">
                                         {{ \App\Helpers\Sportify::rupiah($lap->harga_per_jam) }}/jam
@@ -68,8 +101,14 @@
                                 </p>
 
                                 <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                                    <span><i class="fa-solid fa-clock text-slate-400 mr-1"></i> {{ $lap->slots_count }} Slot Tersedia</span>
-                                    <span class="font-bold text-emerald-600"><i class="fa-solid fa-check-circle mr-1"></i> Disetujui</span>
+                                    <span><i class="fa-solid fa-clock text-slate-400 mr-1"></i> {{ $lap->slots_count }} Slot</span>
+                                    @if($lap->status_verifikasi === 'approved')
+                                        <span class="font-bold text-emerald-600 flex items-center"><i class="fa-solid fa-circle-check mr-1"></i> Disetujui (Aktif)</span>
+                                    @elseif($lap->status_verifikasi === 'rejected')
+                                        <span class="font-bold text-rose-600 flex items-center"><i class="fa-solid fa-circle-xmark mr-1"></i> Ditolak Admin</span>
+                                    @else
+                                        <span class="font-bold text-amber-600 flex items-center animate-pulse"><i class="fa-solid fa-clock mr-1"></i> Menunggu Verifikasi</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

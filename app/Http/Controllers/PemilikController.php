@@ -9,7 +9,6 @@ use App\Models\Lapangan;
 use App\Models\Slot;
 use App\Models\Booking;
 use App\Models\Pembayaran;
-use App\Models\Point;
 use App\Models\Ulasan;
 use Carbon\Carbon;
 
@@ -23,9 +22,14 @@ class PemilikController extends Controller
     public function dashboard()
     {
         $pemilikId = $this->getPemilikId();
+        $pemilik = PemilikLapangan::find($pemilikId);
+
         $lapanganIds = Lapangan::where('id_pemilik', $pemilikId)->pluck('id_lapangan');
 
         $totalLapangan = $lapanganIds->count();
+        $pendingLapanganCount = Lapangan::where('id_pemilik', $pemilikId)->where('status_verifikasi', 'pending')->count();
+        $approvedLapanganCount = Lapangan::where('id_pemilik', $pemilikId)->where('status_verifikasi', 'approved')->count();
+        $rejectedLapanganCount = Lapangan::where('id_pemilik', $pemilikId)->where('status_verifikasi', 'rejected')->count();
 
         $bookingQuery = Booking::whereHas('slot', function ($q) use ($lapanganIds) {
             $q->whereIn('id_lapangan', $lapanganIds);
@@ -48,7 +52,11 @@ class PemilikController extends Controller
             ->get();
 
         return view('sportify.pemilik.dashboard', compact(
+            'pemilik',
             'totalLapangan',
+            'pendingLapanganCount',
+            'approvedLapanganCount',
+            'rejectedLapanganCount',
             'totalBooking',
             'pendingBooking',
             'confirmedBooking',
@@ -61,22 +69,36 @@ class PemilikController extends Controller
     public function lapanganIndex()
     {
         $pemilikId = $this->getPemilikId();
+        $pemilik = PemilikLapangan::find($pemilikId);
         $lapangans = Lapangan::withCount('slots')
             ->where('id_pemilik', $pemilikId)
             ->latest('id_lapangan')
             ->get();
 
-        return view('sportify.pemilik.lapangan.index', compact('lapangans'));
+        return view('sportify.pemilik.lapangan.index', compact('lapangans', 'pemilik'));
     }
 
     public function lapanganCreate()
     {
+        $pemilikId = $this->getPemilikId();
+        $pemilik = PemilikLapangan::find($pemilikId);
+
+        if ($pemilik && $pemilik->status_verifikasi !== 'approved') {
+            $statusText = $pemilik->status_verifikasi === 'pending' ? 'menunggu verifikasi' : 'ditolak';
+            return redirect()->route('pemilik.dashboard')->with('error', "Akun pemilik Anda berstatus {$statusText} oleh administrator. Anda baru dapat menambahkan lapangan setelah akun Anda diverifikasi dan disetujui oleh Administrator.");
+        }
+
         return view('sportify.pemilik.lapangan.create');
     }
 
     public function lapanganStore(Request $request)
     {
         $pemilikId = $this->getPemilikId();
+        $pemilik = PemilikLapangan::find($pemilikId);
+
+        if ($pemilik && $pemilik->status_verifikasi !== 'approved') {
+            return redirect()->route('pemilik.dashboard')->with('error', 'Akun pemilik Anda belum disetujui oleh Administrator.');
+        }
 
         $request->validate([
             'nama_lapangan' => 'required|string|max:255',
@@ -107,7 +129,7 @@ class PemilikController extends Controller
             'harga_per_jam' => $request->harga_per_jam,
             'deskripsi' => $request->deskripsi,
             'foto' => $fotoPath,
-            'status_verifikasi' => 'approved', // Auto-approved or pending by admin
+            'status_verifikasi' => 'pending', // Menunggu persetujuan Administrator (status: approved / rejected)
         ]);
 
         // Auto-generate slots for today and next 2 days
@@ -139,7 +161,7 @@ class PemilikController extends Controller
             }
         }
 
-        return redirect()->route('pemilik.lapangan.index')->with('success', 'Lapangan baru berhasil didaftarkan dan slot jadwal telah siap!');
+        return redirect()->route('pemilik.lapangan.index')->with('success', "Lapangan baru '{$lapangan->nama_lapangan}' berhasil didaftarkan! Status saat ini: Menunggu Verifikasi Admin. Lapangan akan otomatis tampil ke pelanggan setelah disetujui Administrator.");
     }
 
     public function lapanganEdit($id)
@@ -288,16 +310,9 @@ class PemilikController extends Controller
                     $booking->pembayaran->catatan_verifikasi = $request->catatan ?: 'Pembayaran telah dikonfirmasi dan diverifikasi oleh pemilik lapangan.';
                     $booking->pembayaran->save();
                 }
-
-                // Award Loyalty Points to Customer: 100 points per booking!
-                Point::create([
-                    'id_customer' => $booking->id_customer,
-                    'jumlah_point' => 100,
-                    'riwayat_transaksi' => 'Poin Pemesanan Dikonfirmasi #' . $booking->id_booking . ' (' . $booking->slot->lapangan->nama_lapangan . ')',
-                ]);
             });
 
-            return back()->with('success', 'Pembayaran berhasil diverifikasi! Pesanan berstatus Terkonfirmasi dan Pelanggan memperoleh 100 Poin Loyalitas.');
+            return back()->with('success', 'Pembayaran berhasil diverifikasi! Pesanan berstatus Terkonfirmasi.');
         } else {
             DB::transaction(function () use ($booking, $request) {
                 $booking->status_booking = 'cancelled';

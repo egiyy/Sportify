@@ -31,4 +31,14 @@ class Booking extends Model
     {
         return $this->belongsTo(Slot::class, 'id_slot', 'id_slot');
     }
+
+    public function pembayaran()
+    {
+        return $this->hasOne(Pembayaran::class, 'id_booking', 'id_booking');
+    }
+
+    public function ulasan()
+    {
+        return $this->hasOne(Ulasan::class, 'id_booking', 'id_booking');
+    }
 }

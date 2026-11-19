@@ -11,9 +11,6 @@ use App\Models\Lapangan;
 use App\Models\Slot;
 use App\Models\Booking;
 use App\Models\Pembayaran;
-use App\Models\Point;
-use App\Models\Reward;
-use App\Models\Penukaran;
 use App\Models\Ulasan;
 use Carbon\Carbon;
 
@@ -142,58 +139,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        // 5. Rewards Catalog
-        
-$rewards = [
-    [
-        'nama_reward' => 'Air Mineral Dingin 600ml',
-        'poin_dibutuhkan' => 30,
-        'stok' => 50,
-        'deskripsi' => 'Segarkan tubuh setelah lelah bertanding dengan air mineral murni berkualitas.',
-        'foto' => 'https://image-asset.parto.id/i/5q/e6b664ca9c38ba4be095f5009dbdabdd.jpg',
-    ],
-    [
-        'nama_reward' => 'Pocari Sweat Isotonik 500ml',
-        'poin_dibutuhkan' => 60,
-        'stok' => 30,
-        'deskripsi' => 'Gantikan ion dan cairan tubuh yang hilang selama olahraga dengan minuman isotonik terbaik.',
-        'foto' => 'https://wingonfile01.easesales.com/upload/3302BA3D66D2EDC2/202005/4834603554203765292.png_700x650.ashx',
-    ],
-    [
-        'nama_reward' => 'Handuk Olahraga Microfiber Sportify',
-        'poin_dibutuhkan' => 150,
-        'stok' => 20,
-        'deskripsi' => 'Handuk microfiber cepat serap keringat, lembut dan mudah dibawa dengan logo resmi Sportify.',
-        'foto' => 'https://cdn.plutosport.com/a/ProductMedia/Avento/P.AVE.ACC.6903/42AC-GRY_g1.jpg?33=&profile=product_page_image_medium',
-    ],
-    [
-        'nama_reward' => 'Kaos Kaki Futsal Anti-Slip',
-        'poin_dibutuhkan' => 180,
-        'stok' => 15,
-        'deskripsi' => 'Kaos kaki grip pad anti licin, mencengkeram sepatu futsal dengan mantap saat akselerasi.',
-        'foto' => 'https://down-my.img.susercontent.com/file/11fc3ef785a0beeae9a87fbc527fb318',
-    ],
-    [
-        'nama_reward' => 'Jersey Eksklusif Sportify Edition',
-        'poin_dibutuhkan' => 450,
-        'stok' => 10,
-        'deskripsi' => 'Jersey dry-fit eksklusif edisi terbatas Sportify dengan sablon reflektif premium.',
-        'foto' => 'https://www.footballplus.com.au/cdn/shop/products/ROYALBLUEJERSEY.jpg?v=1586149445',
-    ],
-    [
-        'nama_reward' => 'Voucher Diskon Sewa 50% (Max 75k)',
-        'poin_dibutuhkan' => 500,
-        'stok' => 12,
-        'deskripsi' => 'Potongan langsung sewa lapangan apa saja di seluruh venue rekanan Sportify.',
-        'foto' => 'https://www.sportsdirect.com/images/imgzoom/97/97651690_xxl_a1.jpg',
-    ],
-];
-
-        foreach ($rewards as $r) {
-            Reward::updateOrCreate(['nama_reward' => $r['nama_reward']], $r);
-        }
-
-        // 6. Slots Generation for Today & Next 3 Days
+        // 5. Slots Generation for Today & Next 3 Days
         $lapangans = [$lapangan1, $lapangan2, $lapangan3, $lapangan4, $lapangan5];
 
         $timeSlots = [
@@ -332,55 +278,6 @@ $rewards = [
                 'balasan_pemilik' => 'Terima kasih atas ulasannya! Kami senang Kakak menikmati fasilitas lapangan basket kami.',
                 'tanggal_balasan' => Carbon::now()->subDays(2),
             ]);
-        }
-
-        // 8. Points & Loyalty History
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Reward Pemesanan Selesai Lapangan Sintetis #1'],
-            [
-                'id_customer' => $customer1->id_customer,
-                'jumlah_point' => 150,
-            ]
-        );
-
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify'],
-            [
-                'id_customer' => $customer1->id_customer,
-                'jumlah_point' => 100,
-            ]
-        );
-
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Reward Pemesanan Selesai Lapangan Badminton #2'],
-            [
-                'id_customer' => $customer1->id_customer,
-                'jumlah_point' => 120,
-            ]
-        );
-
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify'],
-            [
-                'id_customer' => $customer2->id_customer,
-                'jumlah_point' => 100,
-            ]
-        );
-
-        // 9. Sample Penukaran Reward
-        $rewardSample = Reward::where('nama_reward', 'like', '%Pocari%')->first();
-
-        if ($rewardSample) {
-            Penukaran::firstOrCreate(
-                [
-                    'id_customer' => $customer1->id_customer,
-                    'id_reward' => $rewardSample->id_reward,
-                ],
-                [
-                    'tanggal_tukar' => Carbon::now()->subDays(1),
-                    'status_penukaran' => 'selesai',
-                ]
-            );
         }
     }
 }

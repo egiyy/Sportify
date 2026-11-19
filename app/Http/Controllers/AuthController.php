@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Admin;
 use App\Models\Customer;
 use App\Models\PemilikLapangan;
-use App\Models\Point;
 
 class AuthController extends Controller
 {
@@ -22,22 +21,43 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'role' => 'required|in:customer,pemilik,admin',
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        $role = $request->input('role');
         $email = $request->input('email');
         $password = $request->input('password');
 
-        $user = match ($role) {
-            'admin' => Admin::where('email', $email)->first(),
-            'pemilik' => PemilikLapangan::where('email', $email)->first(),
-            'customer' => Customer::where('email', $email)->first(),
-        };
+        $user = null;
+        $role = null;
 
-        if (!$user || !Hash::check($password, $user->password)) {
+        // 1. Cek akun Administrator
+        $admin = Admin::where('email', $email)->first();
+        if ($admin && Hash::check($password, $admin->password)) {
+            $user = $admin;
+            $role = 'admin';
+        }
+
+        // 2. Cek akun Pemilik Lapangan
+        if (!$user) {
+            $pemilik = PemilikLapangan::where('email', $email)->first();
+            if ($pemilik && Hash::check($password, $pemilik->password)) {
+                $user = $pemilik;
+                $role = 'pemilik';
+            }
+        }
+
+        // 3. Cek akun Customer (Pelanggan)
+        if (!$user) {
+            $customer = Customer::where('email', $email)->first();
+            if ($customer && Hash::check($password, $customer->password)) {
+                $user = $customer;
+                $role = 'customer';
+            }
+        }
+
+        // Jika tidak ditemukan atau password tidak cocok di tabel manapun
+        if (!$user) {
             return back()->withInput()->with('error', 'Email atau password yang Anda masukkan salah!');
         }
 
@@ -59,36 +79,6 @@ class AuthController extends Controller
         };
 
         return redirect($redirectRoute)->with('success', 'Selamat datang kembali, ' . session('sportify_user_name') . '!');
-    }
-
-    public function demoLogin(string $role)
-    {
-        $user = match ($role) {
-            'admin' => Admin::first(),
-            'pemilik' => PemilikLapangan::first(),
-            'customer' => Customer::first(),
-            default => null,
-        };
-
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'Data demo belum tersedia.');
-        }
-
-        session([
-            'sportify_user_id' => $user->getKey(),
-            'sportify_user_role' => $role,
-            'sportify_user_name' => $user->nama ?? $user->nama_pemilik ?? $user->nama_admin,
-            'sportify_user_email' => $user->email,
-        ]);
-
-        $redirectRoute = match ($role) {
-            'admin' => route('admin.dashboard'),
-            'pemilik' => route('pemilik.dashboard'),
-            'customer' => route('home'),
-            default => route('home'),
-        };
-
-        return redirect($redirectRoute)->with('success', 'Login otomatis sebagai ' . ucfirst($role) . ' (' . session('sportify_user_name') . ') berhasil!');
     }
 
     public function showRegister()
@@ -113,7 +103,7 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'no_wa' => $request->no_wa,
-                'status_verifikasi' => 'approved',
+                'status_verifikasi' => 'pending', // Menunggu persetujuan dari admin
             ]);
 
             session([
@@ -123,7 +113,7 @@ class AuthController extends Controller
                 'sportify_user_email' => $pemilik->email,
             ]);
 
-            return redirect()->route('pemilik.dashboard')->with('success', 'Pendaftaran pemilik lapangan berhasil!');
+            return redirect()->route('pemilik.dashboard')->with('info', 'Pendaftaran pemilik lapangan berhasil! Akun Anda saat ini berstatus Menunggu Verifikasi Admin. Anda dapat melihat dashboard, namun penambahan lapangan baru akan aktif setelah akun disetujui Administrator.');
         } else {
             $request->validate([
                 'nama' => 'required|string|max:255',
@@ -139,13 +129,6 @@ class AuthController extends Controller
                 'no_wa' => $request->no_wa,
             ]);
 
-            // Welcome bonus points!
-            Point::create([
-                'id_customer' => $customer->id_customer,
-                'jumlah_point' => 50,
-                'riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify',
-            ]);
-
             session([
                 'sportify_user_id' => $customer->id_customer,
                 'sportify_user_role' => 'customer',
@@ -153,7 +136,7 @@ class AuthController extends Controller
                 'sportify_user_email' => $customer->email,
             ]);
 
-            return redirect()->route('home')->with('success', 'Pendaftaran berhasil! Anda mendapatkan bonus 50 Poin Loyalitas Sportify!');
+            return redirect()->route('home')->with('success', 'Pendaftaran berhasil! Selamat datang di Sportify.');
         }
     }
 

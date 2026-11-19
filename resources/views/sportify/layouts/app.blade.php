@@ -64,38 +64,6 @@
 </head>
 <body class="flex flex-col min-h-full font-sans text-slate-800 antialiased selection:bg-sport-500 selection:text-white">
 
-    <!-- Top Quick Demo Role Switcher Bar for Presentation / Testing -->
-    <div class="bg-dark-900 border-b border-slate-800 text-xs text-slate-300 py-1.5 px-4 hidden md:block">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    <i class="fa-solid fa-flask-vial mr-1"></i> DEMO MODE UNILA
-                </span>
-                <span>Proyek Praktikum Pemrograman Web Lanjut (Reggy Desvita Kamal - 2417051016)</span>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-slate-400">Login Cepat:</span>
-                <a href="{{ route('demo.login', 'customer') }}" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-sport-600 hover:text-white transition font-medium text-emerald-400 border border-slate-700">
-                    <i class="fa-solid fa-user mr-1"></i> Customer
-                </a>
-                <a href="{{ route('demo.login', 'pemilik') }}" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-sport-600 hover:text-white transition font-medium text-blue-400 border border-slate-700">
-                    <i class="fa-solid fa-store mr-1"></i> Pemilik Lapangan
-                </a>
-                <a href="{{ route('demo.login', 'admin') }}" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-sport-600 hover:text-white transition font-medium text-purple-400 border border-slate-700">
-                    <i class="fa-solid fa-shield-halved mr-1"></i> Admin
-                </a>
-                @if(session()->has('sportify_user_id'))
-                    <form action="{{ route('logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="text-rose-400 hover:text-rose-300 px-1.5 py-0.5 transition font-medium">
-                            <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Keluar
-                        </button>
-                    </form>
-                @endif
-            </div>
-        </div>
-    </div>
-
     <!-- Main Navigation Bar -->
     <header x-data="{ mobileOpen: false }" class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,24 +91,31 @@
                     <a href="{{ route('home') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('home') ? 'bg-sport-50 text-sport-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
                         <i class="fa-solid fa-magnifying-glass mr-1.5 text-sport-500"></i> Cari Lapangan
                     </a>
-                    <a href="{{ route('rewards.index') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('rewards.index') ? 'bg-sport-50 text-sport-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
-                        <i class="fa-solid fa-gift mr-1.5 text-amber-500"></i> Reward & Poin
-                    </a>
 
                     @if(session('sportify_user_role') === 'customer')
                         <a href="{{ route('customer.bookings') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('customer.bookings') ? 'bg-sport-50 text-sport-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
                             <i class="fa-solid fa-calendar-check mr-1.5 text-blue-500"></i> Pesanan Saya
                         </a>
                     @elseif(session('sportify_user_role') === 'pemilik')
-                        <a href="{{ route('pemilik.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
-                            <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard Pemilik
-                        </a>
-                        <a href="{{ route('pemilik.lapangan.index') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
-                            <i class="fa-solid fa-layer-group mr-1.5"></i> Lapangan Saya
-                        </a>
-                        <a href="{{ route('pemilik.bookings') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
-                            <i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Verifikasi Pesanan
-                        </a>
+                        @php
+                            $currentPemilikNav = \App\Models\PemilikLapangan::find(session('sportify_user_id'));
+                            $isPemilikApproved = $currentPemilikNav && $currentPemilikNav->status_verifikasi === 'approved';
+                        @endphp
+                        @if($isPemilikApproved)
+                            <a href="{{ route('pemilik.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('pemilik.dashboard') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
+                                <i class="fa-solid fa-gauge-high mr-1.5"></i> Dashboard Pemilik
+                            </a>
+                            <a href="{{ route('pemilik.lapangan.index') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('pemilik.lapangan.*') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
+                                <i class="fa-solid fa-layer-group mr-1.5"></i> Lapangan Saya
+                            </a>
+                            <a href="{{ route('pemilik.bookings') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold {{ request()->routeIs('pemilik.bookings') ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100' }} transition">
+                                <i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> Verifikasi Pesanan
+                            </a>
+                        @else
+                            <a href="{{ route('pemilik.dashboard') }}" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 transition">
+                                <i class="fa-solid fa-clock mr-1 text-amber-600 animate-pulse"></i> Status: Menunggu Verifikasi Admin
+                            </a>
+                        @endif
                     @elseif(session('sportify_user_role') === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 transition">
                             <i class="fa-solid fa-shield-halved mr-1.5"></i> Admin Dashboard
@@ -161,15 +136,7 @@
                         @php
                             $role = session('sportify_user_role');
                             $user = \App\Helpers\Sportify::user();
-                            $points = ($role === 'customer' && $user) ? $user->total_poin : 0;
                         @endphp
-
-                        @if($role === 'customer')
-                            <a href="{{ route('rewards.index') }}" class="inline-flex items-center px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-50 to-amber-100/80 border border-amber-200 text-amber-800 text-xs font-bold hover:scale-105 transition shadow-sm">
-                                <i class="fa-solid fa-coins text-amber-500 mr-1.5 text-sm animate-pulse"></i>
-                                <span>{{ $points }} Poin</span>
-                            </a>
-                        @endif
 
                         <!-- User Profile Dropdown -->
                         <div x-data="{ open: false }" class="relative">
@@ -201,19 +168,32 @@
                                     <a href="{{ route('customer.bookings') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
                                         <i class="fa-solid fa-calendar-days text-slate-400 mr-2.5 w-4"></i> Riwayat Booking
                                     </a>
-                                    <a href="{{ route('rewards.index') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                        <i class="fa-solid fa-gift text-slate-400 mr-2.5 w-4"></i> Katalog Hadiah Poin
-                                    </a>
                                 @elseif($role === 'pemilik')
-                                    <a href="{{ route('pemilik.dashboard') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                        <i class="fa-solid fa-gauge text-slate-400 mr-2.5 w-4"></i> Dashboard Pemilik
-                                    </a>
-                                    <a href="{{ route('pemilik.lapangan.index') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                        <i class="fa-solid fa-futbol text-slate-400 mr-2.5 w-4"></i> Kelola Lapangan
-                                    </a>
-                                    <a href="{{ route('pemilik.slots') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                        <i class="fa-solid fa-clock text-slate-400 mr-2.5 w-4"></i> Atur Slot Jadwal
-                                    </a>
+                                    @php
+                                        $currentPemilikDrop = \App\Models\PemilikLapangan::find(session('sportify_user_id'));
+                                        $isPemilikApprovedDrop = $currentPemilikDrop && $currentPemilikDrop->status_verifikasi === 'approved';
+                                    @endphp
+                                    @if($isPemilikApprovedDrop)
+                                        <a href="{{ route('pemilik.dashboard') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                            <i class="fa-solid fa-gauge text-slate-400 mr-2.5 w-4"></i> Dashboard Pemilik
+                                        </a>
+                                        <a href="{{ route('pemilik.lapangan.index') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                            <i class="fa-solid fa-futbol text-slate-400 mr-2.5 w-4"></i> Kelola Lapangan
+                                        </a>
+                                        <a href="{{ route('pemilik.slots') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                            <i class="fa-solid fa-clock text-slate-400 mr-2.5 w-4"></i> Atur Slot Jadwal
+                                        </a>
+                                        <a href="{{ route('pemilik.bookings') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                            <i class="fa-solid fa-file-invoice-dollar text-slate-400 mr-2.5 w-4"></i> Verifikasi Pesanan
+                                        </a>
+                                        <a href="{{ route('pemilik.ulasan.index') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                            <i class="fa-solid fa-comments text-slate-400 mr-2.5 w-4"></i> Ulasan Pelanggan
+                                        </a>
+                                    @else
+                                        <div class="px-4 py-2 text-xs text-amber-700 font-semibold bg-amber-50 border-y border-amber-100 flex items-center">
+                                            <i class="fa-solid fa-clock mr-2 text-amber-600 animate-pulse"></i> Menunggu Verifikasi Admin
+                                        </div>
+                                    @endif
                                 @elseif($role === 'admin')
                                     <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
                                         <i class="fa-solid fa-chart-pie text-slate-400 mr-2.5 w-4"></i> Admin Panel
@@ -221,8 +201,14 @@
                                     <a href="{{ route('admin.lapangan') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
                                         <i class="fa-solid fa-check-to-slot text-slate-400 mr-2.5 w-4"></i> Verifikasi Lapangan
                                     </a>
-                                    <a href="{{ route('admin.rewards') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
-                                        <i class="fa-solid fa-gifts text-slate-400 mr-2.5 w-4"></i> Kelola Hadiah
+                                    <a href="{{ route('admin.pemilik') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                        <i class="fa-solid fa-user-check text-slate-400 mr-2.5 w-4"></i> Verifikasi Pemilik
+                                    </a>
+                                    <a href="{{ route('admin.bookings') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                        <i class="fa-solid fa-calendar-check text-slate-400 mr-2.5 w-4"></i> Monitoring Pesanan
+                                    </a>
+                                    <a href="{{ route('admin.pembayaran') }}" class="flex items-center px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium">
+                                        <i class="fa-solid fa-money-bill-transfer text-slate-400 mr-2.5 w-4"></i> Monitoring Pembayaran
                                     </a>
                                 @endif
 
@@ -261,9 +247,6 @@
             <a href="{{ route('home') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-sport-50 hover:text-sport-700">
                 <i class="fa-solid fa-magnifying-glass mr-2 text-sport-500"></i> Cari Lapangan
             </a>
-            <a href="{{ route('rewards.index') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-sport-50 hover:text-sport-700">
-                <i class="fa-solid fa-gift mr-2 text-amber-500"></i> Reward & Poin
-            </a>
             <a href="{{ route('about') }}" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-sport-50 hover:text-sport-700">
                 <i class="fa-solid fa-users mr-2 text-slate-500"></i> Tim Pengembang UNILA
             </a>
@@ -280,9 +263,25 @@
                             <i class="fa-solid fa-calendar-days mr-2"></i> Pesanan Saya
                         </a>
                     @elseif(session('sportify_user_role') === 'pemilik')
-                        <a href="{{ route('pemilik.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
-                            <i class="fa-solid fa-gauge mr-2"></i> Dashboard Pemilik
-                        </a>
+                        @php
+                            $currentPemilikMob = \App\Models\PemilikLapangan::find(session('sportify_user_id'));
+                            $isPemilikApprovedMob = $currentPemilikMob && $currentPemilikMob->status_verifikasi === 'approved';
+                        @endphp
+                        @if($isPemilikApprovedMob)
+                            <a href="{{ route('pemilik.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-gauge mr-2"></i> Dashboard Pemilik
+                            </a>
+                            <a href="{{ route('pemilik.lapangan.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-layer-group mr-2"></i> Lapangan Saya
+                            </a>
+                            <a href="{{ route('pemilik.bookings') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
+                                <i class="fa-solid fa-file-invoice-dollar mr-2"></i> Verifikasi Pesanan
+                            </a>
+                        @else
+                            <div class="px-3 py-2 rounded-lg text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200">
+                                <i class="fa-solid fa-clock mr-2 text-amber-600 animate-pulse"></i> Akun Menunggu Verifikasi Admin
+                            </div>
+                        @endif
                     @elseif(session('sportify_user_role') === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100">
                             <i class="fa-solid fa-shield mr-2"></i> Dashboard Admin
@@ -390,7 +389,7 @@
                         </span>
                     </div>
                     <p class="text-xs text-slate-400 leading-relaxed max-w-md">
-                        Sistem Pemesanan Lapangan Futsal & Olahraga terintegrasi berbasis web dengan fitur pencegahan double booking, manajemen slot jadwal, verifikasi bukti pembayaran, serta program loyalitas poin dan reward.
+                        Sistem Pemesanan Lapangan Futsal & Olahraga terintegrasi berbasis web dengan fitur pencegahan double booking, manajemen slot jadwal, verifikasi bukti pembayaran, serta ulasan pelanggan.
                     </p>
                     <div class="p-3.5 rounded-2xl bg-slate-800/60 border border-slate-700/60 max-w-md">
                         <p class="text-[11px] font-bold text-sport-400 mb-1 flex items-center">
@@ -439,11 +438,6 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('rewards.index') }}" class="hover:text-sport-400 transition flex items-center">
-                                <i class="fa-solid fa-angle-right text-[10px] mr-2 text-slate-500"></i> Katalog Hadiah Poin
-                            </a>
-                        </li>
-                        <li>
                             <a href="{{ route('about') }}" class="hover:text-sport-400 transition flex items-center">
                                 <i class="fa-solid fa-angle-right text-[10px] mr-2 text-slate-500"></i> Tentang Sportify
                             </a>
@@ -451,10 +445,6 @@
                         <li>
                             <a href="{{ route('login') }}" class="hover:text-sport-400 transition flex items-center">
                                 <i class="fa-solid fa-angle-right text-[10px] mr-2 text-slate-500"></i> Masuk / Daftar
-                            </a>
-                        </li>
-                        <li>
-                                
                             </a>
                         </li>
                     </ul>
