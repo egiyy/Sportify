@@ -22,7 +22,7 @@ class SportifySeeder extends Seeder
     public function run(): void
     {
         // 1. Admin
-        $admin = Admin::updateOrCreate(
+        $admin = Admin::firstOrCreate(
             ['email' => 'admin@sportify.com'],
             [
                 'nama_admin' => 'Administrator Sportify',
@@ -32,7 +32,7 @@ class SportifySeeder extends Seeder
         );
 
         // 2. Pemilik Lapangan
-        $pemilik1 = PemilikLapangan::updateOrCreate(
+       $pemilik1 = PemilikLapangan::firstOrCreate(
             ['email' => 'budi@pemilik.com'],
             [
                 'nama_pemilik' => 'Budi Santoso (Champion Arena)',
@@ -42,7 +42,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $pemilik2 = PemilikLapangan::updateOrCreate(
+        $pemilik2 = PemilikLapangan::firstOrCreate(
             ['email' => 'hendra@pemilik.com'],
             [
                 'nama_pemilik' => 'Hendra Wijaya (Golden Sport Center)',
@@ -53,7 +53,7 @@ class SportifySeeder extends Seeder
         );
 
         // 3. Customer
-        $customer1 = Customer::updateOrCreate(
+       $customer1 = Customer::firstOrCreate(
             ['email' => 'reggy@customer.com'],
             [
                 'nama' => 'Reggy Desvita Kamal',
@@ -62,7 +62,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $customer2 = Customer::updateOrCreate(
+        $customer2 = Customer::firstOrCreate(
             ['email' => 'andi@customer.com'],
             [
                 'nama' => 'Andi Pratama',
@@ -72,7 +72,7 @@ class SportifySeeder extends Seeder
         );
 
         // 4. Lapangan
-        $lapangan1 = Lapangan::updateOrCreate(
+        $lapangan1 = Lapangan::firstOrCreate(
             ['nama_lapangan' => 'Champion Futsal Sintetis (A)'],
             [
                 'id_pemilik' => $pemilik1->id_pemilik,
@@ -86,7 +86,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $lapangan2 = Lapangan::updateOrCreate(
+        $lapangan2 = Lapangan::firstOrCreate(
             ['nama_lapangan' => 'Champion Futsal Vinyl Interlock (B)'],
             [
                 'id_pemilik' => $pemilik1->id_pemilik,
@@ -100,7 +100,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $lapangan3 = Lapangan::updateOrCreate(
+       $lapangan3 = Lapangan::firstOrCreate(
             ['nama_lapangan' => 'Golden Badminton Hall Court 1'],
             [
                 'id_pemilik' => $pemilik2->id_pemilik,
@@ -114,7 +114,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $lapangan4 = Lapangan::updateOrCreate(
+        $lapangan4 = Lapangan::firstOrCreate(
             ['nama_lapangan' => 'Golden Basketball Court Indoor'],
             [
                 'id_pemilik' => $pemilik2->id_pemilik,
@@ -128,7 +128,7 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $lapangan5 = Lapangan::updateOrCreate(
+        $lapangan5 = Lapangan::firstOrCreate(
             ['nama_lapangan' => 'Golden Volleyball Court Indoor'],
             [
                 'id_pemilik' => $pemilik2->id_pemilik,
@@ -189,9 +189,12 @@ $rewards = [
     ],
 ];
 
-        foreach ($rewards as $r) {
-            Reward::updateOrCreate(['nama_reward' => $r['nama_reward']], $r);
-        }
+       foreach ($rewards as $r) {
+    Reward::firstOrCreate(
+        ['nama_reward' => $r['nama_reward']],
+        $r
+    );
+}
 
         // 6. Slots Generation for Today & Next 3 Days
         $lapangans = [$lapangan1, $lapangan2, $lapangan3, $lapangan4, $lapangan5];
@@ -199,6 +202,7 @@ $rewards = [
         $timeSlots = [
             ['08:00', '09:00'],
             ['09:00', '10:00'],
+            ['10:00', '11:00'],
             ['14:00', '15:00'],
             ['15:00', '16:00'],
             ['16:00', '17:00'],
@@ -210,7 +214,7 @@ $rewards = [
 
         $today = Carbon::today();
 
-        for ($day = 0; $day <= 3; $day++) {
+        for ($day = -1; $day <= 3; $day++) {
             $date = $today->copy()->addDays($day)->toDateString();
 
             foreach ($lapangans as $lap) {
@@ -233,7 +237,10 @@ $rewards = [
         // 7. Seed Past Completed Bookings & Active Bookings for Demo
 
         // Booking 1: Reggy (Completed - Futsal)
-        $slot1 = Slot::where('id_lapangan', $lapangan1->id_lapangan)->first();
+      $slot1 = Slot::where('id_lapangan', $lapangan1->id_lapangan)
+    ->where('tanggal', Carbon::yesterday()->toDateString())
+    ->where('jam_mulai', '08:00')
+    ->first();
 
         if ($slot1 && !$slot1->booking) {
             $slot1->update(['status_slot' => 'dibooking']);
@@ -242,7 +249,7 @@ $rewards = [
                 'id_customer' => $customer1->id_customer,
                 'id_slot' => $slot1->id_slot,
                 'id_admin' => $admin->id_admin,
-                'tanggal_booking' => Carbon::now()->subDays(2),
+               'tanggal_booking' => Carbon::yesterday()->setTime(11, 0),
                 'total_harga' => $lapangan1->harga_per_jam,
                 'status_booking' => 'completed',
                 'catatan' => 'Main futsal bareng teman angkatan Ilkom UNILA.',
@@ -252,7 +259,7 @@ $rewards = [
                 'id_booking' => $b1->id_booking,
                 'metode_bayar' => 'QRIS',
                 'status_bayar' => 'lunas',
-                'waktu_transaksi' => Carbon::now()->subDays(2),
+                'waktu_transaksi' => Carbon::yesterday()->setTime(11, 0),
                 'bukti_bayar' => 'https://dummyimage.com/600x400/10b981/ffffff&text=BUKTI+BAYAR+QRIS+LUNAS',
                 'catatan_verifikasi' => 'Pembayaran QRIS telah diverifikasi lunas.',
             ]);
@@ -264,14 +271,15 @@ $rewards = [
                 'rating' => 5,
                 'komentar' => 'Lapangannya sangat bersih, rumput sintetisnya empuk dan lampu penerangannya mantap! Sangat recommended.',
                 'balasan_pemilik' => 'Terima kasih banyak Kak Reggy! Ditunggu kedatangannya kembali bersama tim.',
-                'tanggal_balasan' => Carbon::now()->subDay(),
+                'tanggal_balasan' => Carbon::yesterday()->setTime(12, 0),
             ]);
         }
 
         // Booking 2: Andi (Pending Payment Approval)
-        $slot2 = Slot::where('id_lapangan', $lapangan2->id_lapangan)
-            ->skip(1)
-            ->first();
+     $slot2 = Slot::where('id_lapangan', $lapangan2->id_lapangan)
+    ->where('tanggal', Carbon::tomorrow()->toDateString())
+    ->where('jam_mulai', '09:00')
+    ->first();
 
         if ($slot2 && !$slot2->booking) {
             $slot2->update(['status_slot' => 'dibooking']);
@@ -297,9 +305,10 @@ $rewards = [
         }
 
         // Booking 3: Andi (Completed - Basketball)
-        $slot3 = Slot::where('id_lapangan', $lapangan4->id_lapangan)
-            ->where('status_slot', 'tersedia')
-            ->first();
+      $slot3 = Slot::where('id_lapangan', $lapangan4->id_lapangan)
+    ->where('tanggal', Carbon::yesterday()->toDateString())
+    ->where('jam_mulai', '10:00')
+    ->first();
 
         if ($slot3 && !$slot3->booking) {
             $slot3->update(['status_slot' => 'dibooking']);
@@ -308,7 +317,7 @@ $rewards = [
                 'id_customer' => $customer2->id_customer,
                 'id_slot' => $slot3->id_slot,
                 'id_admin' => $admin->id_admin,
-                'tanggal_booking' => Carbon::now()->subDays(3),
+                'tanggal_booking' => Carbon::yesterday()->setTime(11, 0),
                 'total_harga' => $lapangan4->harga_per_jam,
                 'status_booking' => 'completed',
                 'catatan' => 'Bermain basket bersama teman kampus.',
@@ -318,7 +327,7 @@ $rewards = [
                 'id_booking' => $b3->id_booking,
                 'metode_bayar' => 'QRIS',
                 'status_bayar' => 'lunas',
-                'waktu_transaksi' => Carbon::now()->subDays(3),
+                'waktu_transaksi' => Carbon::yesterday()->setTime(11, 0),
                 'bukti_bayar' => 'https://dummyimage.com/600x400/10b981/ffffff&text=BUKTI+BAYAR+BASKET',
                 'catatan_verifikasi' => 'Pembayaran lapangan basket telah diverifikasi lunas.',
             ]);
@@ -330,43 +339,51 @@ $rewards = [
                 'rating' => 5,
                 'komentar' => 'Lapangan basket sangat bagus, lantainya nyaman, ring kokoh, dan fasilitasnya bersih. Cocok untuk bermain bersama teman!',
                 'balasan_pemilik' => 'Terima kasih atas ulasannya! Kami senang Kakak menikmati fasilitas lapangan basket kami.',
-                'tanggal_balasan' => Carbon::now()->subDays(2),
+                'tanggal_balasan' => Carbon::yesterday()->setTime(12, 0),
             ]);
         }
+// 8. Points & Loyalty History
 
-        // 8. Points & Loyalty History
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Reward Pemesanan Selesai Lapangan Sintetis #1'],
-            [
-                'id_customer' => $customer1->id_customer,
-                'jumlah_point' => 150,
-            ]
-        );
+Point::firstOrCreate(
+    [
+        'id_customer' => $customer1->id_customer,
+        'riwayat_transaksi' => 'Reward Pemesanan Selesai Lapangan Sintetis #1',
+    ],
+    [
+        'jumlah_point' => 150,
+    ]
+);
 
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify'],
-            [
-                'id_customer' => $customer1->id_customer,
-                'jumlah_point' => 100,
-            ]
-        );
+Point::firstOrCreate(
+    [
+        'id_customer' => $customer1->id_customer,
+        'riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify',
+    ],
+    [
+        'jumlah_point' => 100,
+    ]
+);
 
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Reward Pemesanan Selesai Lapangan Badminton #2'],
-            [
-                'id_customer' => $customer1->id_customer,
-                'jumlah_point' => 120,
-            ]
-        );
+Point::firstOrCreate(
+    [
+        'id_customer' => $customer1->id_customer,
+        'riwayat_transaksi' => 'Reward Pemesanan Selesai Lapangan Badminton #2',
+    ],
+    [
+        'jumlah_point' => 120,
+    ]
+);
 
-        Point::firstOrCreate(
-            ['riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify'],
-            [
-                'id_customer' => $customer2->id_customer,
-                'jumlah_point' => 100,
-            ]
-        );
-
+Point::firstOrCreate(
+    [
+        'id_customer' => $customer2->id_customer,
+        'riwayat_transaksi' => 'Bonus Pendaftaran Member Baru Sportify',
+    ],
+    [
+        'jumlah_point' => 100,
+    ]
+);
+    
         // 9. Sample Penukaran Reward
         $rewardSample = Reward::where('nama_reward', 'like', '%Pocari%')->first();
 

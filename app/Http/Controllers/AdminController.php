@@ -98,11 +98,69 @@ class AdminController extends Controller
         return view('sportify.admin.bookings', compact('bookings', 'status'));
     }
 
-    public function pembayaranIndex()
-    {
-        $pembayarans = Pembayaran::with(['booking.customer', 'booking.slot.lapangan'])->latest('id_pembayaran')->paginate(15);
-        return view('sportify.admin.pembayaran', compact('pembayarans'));
+   
+public function pembayaranIndex(Request $request)
+{
+    // Statistik seluruh transaksi pembayaran
+    $totalTransaksi = Pembayaran::count();
+
+    $totalPending = Pembayaran::where('status_bayar', 'pending')->count();
+
+    $totalLunas = Pembayaran::where('status_bayar', 'lunas')->count();
+
+    $totalDitolak = Pembayaran::where('status_bayar', 'ditolak')->count();
+
+    $totalPendapatan = Booking::whereHas('pembayaran', function ($query) {
+        $query->where('status_bayar', 'lunas');
+    })->sum('total_harga');
+
+    // Query data pembayaran
+    $query = Pembayaran::with([
+        'booking.customer',
+        'booking.slot.lapangan'
+    ])->latest('id_pembayaran');
+
+    // Filter berdasarkan status pembayaran
+    $status = $request->query('status', 'all');
+
+    if (in_array($status, ['pending', 'lunas', 'ditolak'])) {
+        $query->where('status_bayar', $status);
+    } else {
+        $status = 'all';
     }
+
+    // Pencarian transaksi
+    $search = trim($request->query('search', ''));
+
+    if ($search !== '') {
+        $query->whereHas('booking', function ($bookingQuery) use ($search) {
+            if (is_numeric($search)) {
+                $bookingQuery->where('id_booking', $search);
+            }
+
+            $bookingQuery->orWhereHas('customer', function ($customerQuery) use ($search) {
+                $customerQuery->where('nama', 'ilike', "%{$search}%")
+                    ->orWhere('email', 'ilike', "%{$search}%");
+            })->orWhereHas('slot.lapangan', function ($lapanganQuery) use ($search) {
+                $lapanganQuery->where('nama_lapangan', 'ilike', "%{$search}%");
+            });
+        });
+    }
+
+    $pembayarans = $query->paginate(15)->withQueryString();
+
+    return view('sportify.admin.pembayaran', compact(
+        'pembayarans',
+        'totalTransaksi',
+        'totalPending',
+        'totalLunas',
+        'totalDitolak',
+        'totalPendapatan',
+        'status',
+        'search'
+    ));
+}
+
 
     // --- REWARDS CRUD ---
     public function rewardIndex()

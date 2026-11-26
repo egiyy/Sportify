@@ -141,11 +141,19 @@
                     <h3 class="font-display font-bold text-lg text-slate-900">Monitoring Pemesanan Terkini</h3>
                     <p class="text-xs text-slate-500">Transparansi seluruh pemesanan yang berlangsung di sistem Sportify</p>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <a href="{{ route('admin.bookings') }}" class="text-xs font-bold text-purple-600 hover:text-purple-700">
-                        Semua Booking <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
+                <div class="flex items-center gap-4">
+    <a href="{{ route('admin.pembayaran') }}"
+        class="text-xs font-bold text-emerald-600 hover:text-emerald-700">
+        Monitoring Pembayaran
+        <i class="fa-solid fa-arrow-right ml-1"></i>
+    </a>
+
+    <a href="{{ route('admin.bookings') }}"
+        class="text-xs font-bold text-purple-600 hover:text-purple-700">
+        Semua Booking
+        <i class="fa-solid fa-arrow-right ml-1"></i>
+    </a>
+</div>
             </div>
 
             <div class="overflow-x-auto">
