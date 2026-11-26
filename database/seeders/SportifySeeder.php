@@ -125,23 +125,8 @@ class SportifySeeder extends Seeder
             ]
         );
 
-        $lapangan5 = Lapangan::updateOrCreate(
-            ['nama_lapangan' => 'Golden Volleyball Court Indoor'],
-            [
-                'id_pemilik' => $pemilik2->id_pemilik,
-                'id_admin' => $admin->id_admin,
-                'jenis_olahraga' => 'Voli',
-                'lokasi' => 'Jl. Teuku Umar No. 12, Kedaton, Bandar Lampung',
-                'harga_per_jam' => 100000,
-                'deskripsi' => 'Lapangan bola voli indoor dengan lantai berkualitas, net standar pertandingan, pencahayaan terang, dan area bermain yang nyaman.',
-                'foto' => 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&auto=format&fit=crop&q=80',
-                'status_verifikasi' => 'approved',
-            ]
-        );
-
         // 5. Slots Generation for Today & Next 3 Days
-        $lapangans = [$lapangan1, $lapangan2, $lapangan3, $lapangan4, $lapangan5];
-
+        $lapangans = [$lapangan1, $lapangan2, $lapangan3, $lapangan4];
         $timeSlots = [
             ['08:00', '09:00'],
             ['09:00', '10:00'],
@@ -158,7 +143,6 @@ class SportifySeeder extends Seeder
 
         for ($day = 0; $day <= 3; $day++) {
             $date = $today->copy()->addDays($day)->toDateString();
-
             foreach ($lapangans as $lap) {
                 foreach ($timeSlots as $slotTime) {
                     Slot::firstOrCreate(
@@ -176,14 +160,10 @@ class SportifySeeder extends Seeder
             }
         }
 
-        // 7. Seed Past Completed Bookings & Active Bookings for Demo
-
-        // Booking 1: Reggy (Completed - Futsal)
+        // 6. Seed Past Completed Bookings & Active Bookings for Demo
         $slot1 = Slot::where('id_lapangan', $lapangan1->id_lapangan)->first();
-
         if ($slot1 && !$slot1->booking) {
             $slot1->update(['status_slot' => 'dibooking']);
-
             $b1 = Booking::create([
                 'id_customer' => $customer1->id_customer,
                 'id_slot' => $slot1->id_slot,
@@ -214,14 +194,9 @@ class SportifySeeder extends Seeder
             ]);
         }
 
-        // Booking 2: Andi (Pending Payment Approval)
-        $slot2 = Slot::where('id_lapangan', $lapangan2->id_lapangan)
-            ->skip(1)
-            ->first();
-
+        $slot2 = Slot::where('id_lapangan', $lapangan2->id_lapangan)->skip(1)->first();
         if ($slot2 && !$slot2->booking) {
             $slot2->update(['status_slot' => 'dibooking']);
-
             $b2 = Booking::create([
                 'id_customer' => $customer2->id_customer,
                 'id_slot' => $slot2->id_slot,
@@ -239,44 +214,6 @@ class SportifySeeder extends Seeder
                 'waktu_transaksi' => Carbon::now(),
                 'bukti_bayar' => 'https://dummyimage.com/600x400/3b82f6/ffffff&text=TRANSFER+BCA+Rp135.000',
                 'catatan_verifikasi' => 'Menunggu pengecekan mutasi bank oleh pemilik lapangan.',
-            ]);
-        }
-
-        // Booking 3: Andi (Completed - Basketball)
-        $slot3 = Slot::where('id_lapangan', $lapangan4->id_lapangan)
-            ->where('status_slot', 'tersedia')
-            ->first();
-
-        if ($slot3 && !$slot3->booking) {
-            $slot3->update(['status_slot' => 'dibooking']);
-
-            $b3 = Booking::create([
-                'id_customer' => $customer2->id_customer,
-                'id_slot' => $slot3->id_slot,
-                'id_admin' => $admin->id_admin,
-                'tanggal_booking' => Carbon::now()->subDays(3),
-                'total_harga' => $lapangan4->harga_per_jam,
-                'status_booking' => 'completed',
-                'catatan' => 'Bermain basket bersama teman kampus.',
-            ]);
-
-            Pembayaran::create([
-                'id_booking' => $b3->id_booking,
-                'metode_bayar' => 'QRIS',
-                'status_bayar' => 'lunas',
-                'waktu_transaksi' => Carbon::now()->subDays(3),
-                'bukti_bayar' => 'https://dummyimage.com/600x400/10b981/ffffff&text=BUKTI+BAYAR+BASKET',
-                'catatan_verifikasi' => 'Pembayaran lapangan basket telah diverifikasi lunas.',
-            ]);
-
-            Ulasan::create([
-                'id_booking' => $b3->id_booking,
-                'id_customer' => $customer2->id_customer,
-                'id_lapangan' => $lapangan4->id_lapangan,
-                'rating' => 5,
-                'komentar' => 'Lapangan basket sangat bagus, lantainya nyaman, ring kokoh, dan fasilitasnya bersih. Cocok untuk bermain bersama teman!',
-                'balasan_pemilik' => 'Terima kasih atas ulasannya! Kami senang Kakak menikmati fasilitas lapangan basket kami.',
-                'tanggal_balasan' => Carbon::now()->subDays(2),
             ]);
         }
     }
