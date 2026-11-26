@@ -106,14 +106,8 @@ class AuthController extends Controller
                 'status_verifikasi' => 'pending', // Menunggu persetujuan dari admin
             ]);
 
-            session([
-                'sportify_user_id' => $pemilik->id_pemilik,
-                'sportify_user_role' => 'pemilik',
-                'sportify_user_name' => $pemilik->nama_pemilik,
-                'sportify_user_email' => $pemilik->email,
-            ]);
 
-            return redirect()->route('pemilik.dashboard')->with('info', 'Pendaftaran pemilik lapangan berhasil! Akun Anda saat ini berstatus Menunggu Verifikasi Admin. Anda dapat melihat dashboard, namun penambahan lapangan baru akan aktif setelah akun disetujui Administrator.');
+            return redirect()->route('login')->with('info', 'Pendaftaran pemilik lapangan berhasil! Akun Anda saat ini berstatus Menunggu Verifikasi Admin. Anda dapat login kembali setelah akun anda diverifikasi oleh AdminSportify.');
         } else {
             $request->validate([
                 'nama' => 'required|string|max:255',
@@ -129,14 +123,7 @@ class AuthController extends Controller
                 'no_wa' => $request->no_wa,
             ]);
 
-            session([
-                'sportify_user_id' => $customer->id_customer,
-                'sportify_user_role' => 'customer',
-                'sportify_user_name' => $customer->nama,
-                'sportify_user_email' => $customer->email,
-            ]);
-
-            return redirect()->route('home')->with('success', 'Pendaftaran berhasil! Selamat datang di Sportify.');
+            return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silahkan login kembali menggunakan email dan password Anda.');
         }
     }
 

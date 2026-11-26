@@ -38,12 +38,6 @@
                 </button>
             </div>
 
-            <!-- Customer Promo Note -->
-            <div x-show="role === 'customer'" class="mb-5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center space-x-2">
-                <i class="fa-solid fa-gift text-amber-500 text-sm"></i>
-                <span>Daftar sekarang dan dapatkan bonus langsung <strong class="font-bold">50 Poin Loyalitas</strong>!</span>
-            </div>
-
             <form action="{{ route('register') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="role" :value="role">
